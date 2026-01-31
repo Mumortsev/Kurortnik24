@@ -6,6 +6,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements first for caching
@@ -17,11 +18,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code
 COPY backend/ /app/
 
+# Copy scripts
+COPY scripts/ /app/scripts/
+
+# Fix line endings and permissions for start script
+RUN dos2unix /app/scripts/start.sh && chmod +x /app/scripts/start.sh
+
 # Create data directory
 RUN mkdir -p /app/data
 
-# Expose port
+# Expose port (just documentation, really)
 EXPOSE 8000
 
-# Default command
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Set Python path
+ENV PYTHONPATH=/app
+
+# Start services
+CMD ["/app/scripts/start.sh"]
