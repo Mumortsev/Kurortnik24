@@ -13,3 +13,6 @@ aiogram>=3.3.0
 
 # Utils
 aiofiles>=23.2.1
+# Excel Import
+pandas>=2.1.0
+openpyxl>=3.1.2
