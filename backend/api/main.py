@@ -64,16 +64,17 @@ app.include_router(orders.router)
 app.include_router(images.router)
 app.include_router(admin.router)
 
-# Serve Static Files (Frontend)
-# Create static directory if it doesn't exist to avoid errors locally
-os.makedirs("static", exist_ok=True)
-
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
 @app.get("/health")
 async def health():
     """Health check for Docker."""
     return {"status": "healthy"}
+
+# Serve Static Files (Frontend)
+# Create static directory if it doesn't exist to avoid errors locally
+os.makedirs("static", exist_ok=True)
+
+app.mount("/static", StaticFiles(directory="static"), name="static_assets") # Mount specific static assets if needed
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 
 
