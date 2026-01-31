@@ -59,7 +59,15 @@ async def create_category(
     db_category = Category(**category.model_dump())
     db.add(db_category)
     await db.commit()
-    await db.refresh(db_category)
+    
+    # Reload with relationships
+    result = await db.execute(
+        select(Category)
+        .options(selectinload(Category.subcategories))
+        .where(Category.id == db_category.id)
+    )
+    db_category = result.scalar_one()
+    
     return db_category
 
 

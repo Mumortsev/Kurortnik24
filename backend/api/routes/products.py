@@ -130,11 +130,12 @@ async def create_product(
             )
             db.add(img)
         await db.commit()
-        # Reload product with images
-        result = await db.execute(
-            select(Product).options(selectinload(Product.images)).where(Product.id == db_product.id)
-        )
-        db_product = result.scalar_one()
+        
+    # Always reload to ensure images relationship is loaded
+    result = await db.execute(
+        select(Product).options(selectinload(Product.images)).where(Product.id == db_product.id)
+    )
+    db_product = result.scalar_one()
 
     return db_product
 
