@@ -12,7 +12,8 @@ from ..utils import is_admin
 
 router = Router()
 
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://yourdomain.com")
+# Hardcode fallback if env var fails
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://kurortnik24-production-7a2c.up.railway.app")
 
 
 @router.message(CommandStart())
