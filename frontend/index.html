@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#F5F0E8">
+    <title>Курортник - Оптовый магазин</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <!-- Logo -->
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="Курортник" class="logo" id="logo" onerror="this.style.display='none'">
+            </div>
+
+            <!-- Welcome & Actions -->
+            <div class="header-top">
+                <div class="welcome-message" id="welcomeMessage">Добро пожаловать!</div>
+                <div class="header-actions">
+                    <button class="header-btn" id="cartBtnHeader" title="Корзина">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
+                            <path
+                                d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
+                            <path
+                                d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
+                        </svg>
+                        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="search-container" id="searchContainer">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <input type="text" class="search-input" id="searchInput" placeholder="Поиск">
+                <button class="search-clear" id="searchClear" style="display: none;">×</button>
+            </div>
+
+            <!-- Categories -->
+            <div class="categories-swipe" id="categoriesSwipe">
+                <!-- Category chips loaded here -->
+            </div>
+
+            <!-- Subcategories -->
+            <div class="subcategories-swipe" id="subcategoriesSwipe" style="display: none;">
+                <!-- Subcategory chips loaded here -->
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Products View (default) -->
+            <div class="view" id="productsView">
+                <!-- Sort -->
+                <div class="sort-container">
+                    <select class="sort-select" id="sortSelect">
+                        <option value="newest">Сначала новые</option>
+                        <option value="oldest">Сначала старые</option>
+                        <option value="price_asc">Цена ↑</option>
+                        <option value="price_desc">Цена ↓</option>
+                        <option value="name_asc">А-Я</option>
+                        <option value="name_desc">Я-А</option>
+                    </select>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products loaded here -->
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="productsLoading" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- No products -->
+                <div class="no-products" id="noProducts" style="display: none;">
+                    <p>Товары не найдены</p>
+                </div>
+            </div>
+
+            <!-- Product Detail View (legacy, kept for backward compatibility) -->
+            <div class="view hidden" id="productView">
+                <button class="back-button" id="productBackBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Назад
+                </button>
+                <div class="product-detail" id="productDetail">
+                    <!-- Product detail loaded here -->
+                </div>
+            </div>
+
+            <!-- Cart View -->
+            <div class="view hidden" id="cartView">
+                <button class="back-button" id="cartBackBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Назад в каталог
+                </button>
+                <h2 class="view-title">Корзина</h2>
+                <div class="cart-items" id="cartItems">
+                    <!-- Cart items loaded here -->
+                </div>
+                <div class="cart-empty" id="cartEmpty" style="display: none;">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p>Корзина пуста</p>
+                    <button class="btn btn-primary" onclick="App.showCatalog()">Перейти в каталог</button>
+                </div>
+                <div class="cart-footer" id="cartFooter" style="display: none;">
+                    <div class="cart-total">
+                        <span>Итого:</span>
+                        <span class="cart-total-amount" id="cartTotal">0₽</span>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="checkoutBtn">Оформить заказ</button>
+                </div>
+            </div>
+
+            <!-- Checkout View -->
+            <div class="view hidden" id="checkoutView">
+                <button class="back-button" id="checkoutBackBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Назад в корзину
+                </button>
+                <h2 class="view-title">Оформление заказа</h2>
+                <form class="checkout-form" id="checkoutForm">
+                    <div class="form-group">
+                        <label for="customerName">Ваше имя <span class="required">*</span></label>
+                        <input type="text" id="customerName" required placeholder="Иван Иванов">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerPhone">Телефон <span class="required">*</span></label>
+                        <input type="tel" id="customerPhone" required placeholder="+7 (900) 123-45-67">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerType">Тип клиента <span class="required">*</span></label>
+                        <select id="customerType" required>
+                            <option value="">Выберите тип</option>
+                            <option value="individual">Физическое лицо</option>
+                            <option value="sole_proprietor">ИП (Индивидуальный предприниматель)</option>
+                            <option value="company">Организация (ООО, АО и т.д.)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="orgNameGroup" style="display: none;">
+                        <label for="customerOrg">Название организации/ИП <span class="required">*</span></label>
+                        <input type="text" id="customerOrg" placeholder="ООО &quot;Компания&quot; или ИП Иванов И.И.">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerComment">Комментарий к заказу</label>
+                        <textarea id="customerComment" placeholder="Дополнительная информация..."></textarea>
+                    </div>
+
+                    <div class="checkout-summary" id="checkoutSummary">
+                        <!-- Order summary -->
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Подтвердить заказ</button>
+                </form>
+            </div>
+
+            <!-- Profile View -->
+            <div class="view hidden" id="profileView">
+                <button class="back-button" id="profileBackBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Назад в каталог
+                </button>
+                <h2 class="view-title">Личный кабинет</h2>
+
+                <!-- Not authorized -->
+                <div class="profile-auth" id="profileAuth">
+                    <div class="auth-info">
+                        <p>Авторизуйтесь через Telegram для сохранения истории заказов</p>
+                        <p class="auth-note">Авторизация не обязательна — вы можете оформить заказ и без неё</p>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="telegramAuthBtn">
+                        Авторизоваться через Telegram
+                    </button>
+                </div>
+
+                <!-- Authorized -->
+                <div class="profile-info" id="profileInfo" style="display: none;">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profileAvatar">👤</div>
+                        <div class="profile-name" id="profileName">Пользователь</div>
+                        <div class="profile-id" id="profileId">ID: —</div>
+                    </div>
+                    <button class="btn btn-secondary btn-block" id="logoutBtn">Выйти</button>
+                </div>
+
+                <!-- Orders History -->
+                <div class="orders-section">
+                    <h3>История заказов</h3>
+                    <div class="orders-list" id="ordersList">
+                        <!-- Orders loaded here -->
+                    </div>
+                    <div class="orders-empty" id="ordersEmpty" style="display: none;">
+                        <p>У вас пока нет заказов</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Product Modal -->
+        <div class="product-modal" id="productModal">
+            <div class="product-modal-backdrop" id="modalBackdrop"></div>
+            <div class="product-modal-content">
+                <button class="modal-close-btn" id="modalCloseBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button class="modal-cart-btn" id="modalCartBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
+                        <path
+                            d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
+                        <path
+                            d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
+                    </svg>
+                    <span class="cart-badge" id="modalCartBadge" style="display: none;">0</span>
+                </button>
+                <div class="product-detail" id="modalProductDetail">
+                    <!-- Product detail loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav" id="bottomNav">
+            <div class="nav-pill">
+                <button class="nav-item active" id="navHome" data-view="productsView">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path d="M9 22V12h6v10" />
+                    </svg>
+                    <span class="nav-label">Home</span>
+                </button>
+                <button class="nav-item" id="navFavorites">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+                    </svg>
+                </button>
+                <button class="nav-item" id="navCart" data-view="cartView">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
+                        <path
+                            d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
+                        <path
+                            d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
+                    </svg>
+                    <span class="nav-badge" id="navCartBadge" style="display: none;">0</span>
+                </button>
+                <button class="nav-item" id="navProfile" data-view="profileView">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+
+        <!-- Scroll to top -->
+        <button class="scroll-top" id="scrollTop" style="display: none;">↑</button>
+    </div>
+
+    <script src="js/api.js?v=2.0"></script>
+    <script src="js/cart.js?v=2.0"></script>
+    <script src="js/catalog.js?v=2.0"></script>
+    <script src="js/app.js?v=2.0"></script>
+</body>
+
+</html>
