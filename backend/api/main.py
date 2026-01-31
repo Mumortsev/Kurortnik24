@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from .database import init_db
-from .routes import categories, products, orders, images
+from .routes import categories, products, orders, images, admin
 
 load_dotenv()
 
@@ -54,6 +54,7 @@ app.include_router(categories.router)
 app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(images.router)
+app.include_router(admin.router)
 
 
 @app.get("/")

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+    <div id="adminApp">
+        <header class="admin-header">
+            <h2>Админ-панель</h2>
+            <div class="user-info" id="adminUserInfo">Checking...</div>
+        </header>
+
+        <nav class="admin-nav">
+            <button class="nav-btn active" data-tab="products">Товары</button>
+            <button class="nav-btn" data-tab="upload">Импорт Excel</button>
+        </nav>
+
+        <main class="admin-content">
+            <!-- Unauthorized View -->
+            <div id="authView" style="display: none; text-align: center; padding: 40px;">
+                <h3>⛔ Нет доступа</h3>
+                <p>Вы не являетесь администратором.</p>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="productsTab" class="tab-content active">
+                <div class="actions-bar">
+                    <button class="btn btn-primary" id="refreshBtn">Use "Import" to add products</button>
+                </div>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Фото</th>
+                                <th>Название</th>
+                                <th>Цена</th>
+                                <th>Пачка</th>
+                                <th>Остаток</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <!-- Rows loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Upload Tab -->
+            <div id="uploadTab" class="tab-content" style="display: none;">
+                <div class="upload-zone" id="dropZone">
+                    <div class="upload-icon">📂</div>
+                    <h3>Перетащите Excel файл сюда</h3>
+                    <p>или нажмите для выбора</p>
+                    <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
+                </div>
+                <div class="upload-status" id="uploadStatus"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>
