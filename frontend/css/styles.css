@@ -50,8 +50,8 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
 
-    /* Header height */
-    --header-height: 200px;
+    /* Header height - increased to accommodate sort menu */
+    --header-height: 220px;
 
     /* Bottom nav height */
     --bottom-nav-height: 70px;
@@ -112,9 +112,11 @@ body {
 
 .header-top {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom: var(--spacing-sm);
+    position: relative;
 }
 
 /* Welcome message */
@@ -142,7 +144,9 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all var(--transition-fast);
-    position: relative;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 
 .header-btn:active {
