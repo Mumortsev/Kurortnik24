@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e
 
+# Define API URL for the bot based on Railway PORT
+export API_URL="http://127.0.0.1:${PORT:-8000}"
+
 # Start Telegram Bot in background
-echo "Starting Telegram Bot..."
+echo "Starting Telegram Bot with API_URL=$API_URL..."
 python -m bot.main &
 
 # Start FastAPI server in foreground
