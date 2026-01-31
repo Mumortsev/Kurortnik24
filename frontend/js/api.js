@@ -4,7 +4,7 @@
 const API = {
     // Base URL - change to your server
     baseUrl: window.location.hostname === 'localhost'
-        ? 'http://localhost:8000'
+        ? 'http://localhost:8000/api'
         : '/api',
 
     /**
@@ -37,7 +37,7 @@ const API = {
      * Get all categories with subcategories
      */
     async getCategories() {
-        return this.request('/api/categories');
+        return this.request('/categories');
     },
 
     /**
@@ -59,21 +59,21 @@ const API = {
         params.append('page', page);
         params.append('limit', limit);
 
-        return this.request(`/api/products?${params.toString()}`);
+        return this.request(`/products?${params.toString()}`);
     },
 
     /**
      * Get single product
      */
     async getProduct(id) {
-        return this.request(`/api/products/${id}`);
+        return this.request(`/products/${id}`);
     },
 
     /**
      * Validate cart before checkout
      */
     async validateCart(items) {
-        return this.request('/api/cart/validate', {
+        return this.request('/cart/validate', {
             method: 'POST',
             body: JSON.stringify({ items })
         });
@@ -83,7 +83,7 @@ const API = {
      * Create order
      */
     async createOrder(orderData) {
-        return this.request('/api/orders', {
+        return this.request('/orders', {
             method: 'POST',
             body: JSON.stringify(orderData)
         });
@@ -94,7 +94,7 @@ const API = {
      */
     async getOrders(telegramId = null) {
         const params = telegramId ? `?telegram_id=${telegramId}` : '';
-        return this.request(`/api/orders${params}`);
+        return this.request(`/orders${params}`);
     },
 
     /**
@@ -114,7 +114,7 @@ const API = {
         }
 
         // Telegram file_id - get via API proxy
-        return `${this.baseUrl}/api/images/${fileIdOrUrl}?size=${size}`;
+        return `${this.baseUrl}/images/${fileIdOrUrl}?size=${size}`;
     }
 };
 
