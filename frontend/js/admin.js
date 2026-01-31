@@ -69,35 +69,46 @@ const Admin = {
 
     async loadProducts() {
         try {
+            // Show loading state if needed
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Загрузка товаров...</td></tr>';
+
             const data = await API.getProducts({ limit: 100 });
             const products = data.items || [];
-            const tbody = document.getElementById('productsTableBody');
+
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Товаров пока нет.</td></tr>';
+                return;
+            }
 
             tbody.innerHTML = products.map(p => `
                 <tr>
-                    <td>${p.id}</td>
-                    <td><img src="${API.getImageUrl(p.image, 'small')}" onerror="this.src='assets/placeholder.svg'"></td>
-                    <td>${p.name}</td>
-                    <td>${p.price_per_unit}₽</td>
-                    <td>${p.pieces_per_pack}</td>
-                    <td>${p.in_stock || '∞'}</td>
                     <td>
-                        <button class="btn btn-sm btn-danger" onclick="Admin.deleteProduct(${p.id})">Del</button>
+                        <img src="${API.getImageUrl(p.image, 'small')}" onerror="this.src='assets/placeholder.svg'">
+                    </td>
+                    <td>
+                        <span class="product-cell-name">${p.name}</span>
+                        <div class="product-cell-price">${p.price_per_unit}₽ / ${p.pieces_per_pack} шт. в пачке</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-sm btn-danger" onclick="Admin.deleteProduct(${p.id})">Удалить</button>
                     </td>
                 </tr>
             `).join('');
         } catch (e) {
             console.error("Failed to load products", e);
+            document.getElementById('productsTableBody').innerHTML = '<tr><td colspan="3" style="color: red; text-align:center;">Ошибка загрузки</td></tr>';
         }
     },
 
     async deleteProduct(id) {
-        if (!confirm('Удалить товар?')) return;
+        if (!confirm('Вы точно хотите удалить этот товар?')) return;
 
         try {
             await fetch(`${API.baseUrl}/products/${id}`, {
                 method: 'DELETE'
             });
+            // Reload list
             this.loadProducts();
         } catch (e) {
             alert('Ошибка удаления');

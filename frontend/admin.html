@@ -17,13 +17,15 @@
 <body>
     <div id="adminApp">
         <header class="admin-header">
-            <h2>Админ-панель</h2>
-            <div class="user-info" id="adminUserInfo">Checking...</div>
+            <div class="header-title">
+                <h2>Администратор</h2>
+                <div class="user-info" id="adminUserInfo">Загрузка...</div>
+            </div>
         </header>
 
         <nav class="admin-nav">
-            <button class="nav-btn active" data-tab="products">Товары</button>
-            <button class="nav-btn" data-tab="upload">Импорт Excel</button>
+            <button class="nav-btn active" data-tab="products">📦 Товары</button>
+            <button class="nav-btn" data-tab="upload">📥 Загрузить из Excel</button>
         </nav>
 
         <main class="admin-content">
@@ -35,20 +37,18 @@
 
             <!-- Products Tab -->
             <div id="productsTab" class="tab-content active">
-                <div class="actions-bar">
-                    <button class="btn btn-primary" id="refreshBtn">Use "Import" to add products</button>
+                <div class="info-card">
+                    <p>Здесь список всех ваших товаров. Вы можете удалить ненужные или проверить цены.</p>
+                    <p>Чтобы добавить много товаров сразу, используйте вкладку <b>"Загрузить из Excel"</b>.</p>
                 </div>
+
                 <div class="table-container">
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Фото</th>
-                                <th>Название</th>
-                                <th>Цена</th>
-                                <th>Пачка</th>
-                                <th>Остаток</th>
-                                <th>Действия</th>
+                                <th width="60">Фото</th>
+                                <th>Название и Цена</th>
+                                <th width="80" style="text-align: center;">Удалить</th>
                             </tr>
                         </thead>
                         <tbody id="productsTableBody">
@@ -60,12 +60,26 @@
 
             <!-- Upload Tab -->
             <div id="uploadTab" class="tab-content" style="display: none;">
+                <div class="instruction-step">
+                    <span class="step-number">1</span>
+                    <p>Подготовьте файл Excel (таблицу) с товарами.</p>
+                    <a href="#" class="download-link" id="downloadTemplate"
+                        onclick="alert('Шаблон можно попросить у разработчика или использовать тот, что был прислан ранее.')">Скачать
+                        пример таблицы</a>
+                </div>
+
+                <div class="instruction-step">
+                    <span class="step-number">2</span>
+                    <p>Нажмите на область ниже и выберите ваш файл.</p>
+                </div>
+
                 <div class="upload-zone" id="dropZone">
-                    <div class="upload-icon">📂</div>
-                    <h3>Перетащите Excel файл сюда</h3>
-                    <p>или нажмите для выбора</p>
+                    <div class="upload-icon">📥</div>
+                    <h3>Нажмите сюда, чтобы загрузить файл</h3>
+                    <p>или перетащите файл в это окно</p>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
                 </div>
+
                 <div class="upload-status" id="uploadStatus"></div>
             </div>
         </main>
