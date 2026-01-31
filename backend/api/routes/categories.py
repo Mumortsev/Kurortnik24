@@ -118,23 +118,33 @@ async def delete_category(category_id: int, db: AsyncSession = Depends(get_db)):
 
 # --- Subcategory routes ---
 
+@router.post("/subcategories", response_model=SubcategoryResponse)
+async def create_subcategory_generic(
+    subcategory: SubcategoryCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    """Create a new subcategory."""
+    # Check category exists
+    result = await db.execute(select(Category).where(Category.id == subcategory.category_id))
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Категория не найдена")
+    
+    db_subcategory = Subcategory(**subcategory.model_dump())
+    db.add(db_subcategory)
+    await db.commit()
+    await db.refresh(db_subcategory)
+    return db_subcategory
+
+
 @router.post("/{category_id}/subcategories", response_model=SubcategoryResponse)
 async def create_subcategory(
     category_id: int,
     subcategory: SubcategoryCreate,
     db: AsyncSession = Depends(get_db)
 ):
-    """Create a new subcategory within a category."""
-    # Check category exists
-    result = await db.execute(select(Category).where(Category.id == category_id))
-    if not result.scalar_one_or_none():
-        raise HTTPException(status_code=404, detail="Категория не найдена")
-    
-    db_subcategory = Subcategory(category_id=category_id, **subcategory.model_dump(exclude={"category_id"}))
-    db.add(db_subcategory)
-    await db.commit()
-    await db.refresh(db_subcategory)
-    return db_subcategory
+    """Create a new subcategory within a category (Legacy path)."""
+    subcategory.category_id = category_id
+    return await create_subcategory_generic(subcategory, db)
 
 
 @router.put("/subcategories/{subcategory_id}", response_model=SubcategoryResponse)

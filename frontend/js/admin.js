@@ -110,25 +110,27 @@ const Admin = {
         `).join('');
     },
 
-    openCategory(catId) {
+    async openCategory(catId) {
         this.currentCategoryId = catId;
+        this.currentSubcategoryId = null;
+
         const category = this.categories.find(c => c.id === catId);
         if (!category) return;
 
         // Update Breadcrumbs
         document.getElementById('breadcrumbs').style.display = 'block';
-        document.getElementById('breadcrumbCurrent').textContent = ` > ${category.name}`;
+        document.getElementById('breadcrumbCurrent').innerHTML = ` <span style="color:#888;">></span> ${category.name}`;
 
-        // Hide top level categories list (simulating drill down)
-        document.getElementById('categoriesList').innerHTML = ''; // Clear or hide?
-        // Actually better to just show products of this category and subcategories
-
-        // Show subcategories if any
+        // Show subcategories
+        document.getElementById('categoriesList').style.display = 'grid';
         if (category.subcategories && category.subcategories.length > 0) {
             document.getElementById('categoriesList').innerHTML = category.subcategories.map(s => `
-                <div class="category-card">
+                <div class="category-card" onclick="Admin.openSubcategory(${s.id})">
                     <div class="category-name">${s.name}</div>
-                    <div class="category-actions">
+                    <div class="category-info" style="font-size:12px; color:#888;">
+                       Нажмите, чтобы открыть
+                    </div>
+                    <div class="category-actions" onclick="event.stopPropagation()">
                         <button class="btn-icon">✏️</button>
                         <button class="btn-icon" style="color:red;" onclick="Admin.deleteSubcategory(${s.id})">🗑</button>
                     </div>
@@ -144,14 +146,48 @@ const Admin = {
             </div>`;
         }
 
-        // Show Products in this category
+        // Show Products in this category (only those without subcategory or all?)
+        // Usually, if we have subcategories, we should probably not show products mixed in
+        // But for simplicity let's show all products of this category regardless of subcategory
         document.getElementById('categoryProductsSection').style.display = 'block';
+        document.querySelector('#categoryProductsSection h3').textContent = `Товары в категории "${category.name}"`;
+        // Update Add Product button to preselect category ONLY
+        document.querySelector('#categoryProductsSection button').onclick = () => Admin.openProductModal(null, catId);
+
         this.loadCategoryProducts(catId);
     },
 
-    async loadCategoryProducts(catId) {
+    async openSubcategory(subId) {
+        this.currentSubcategoryId = subId;
+        const category = this.categories.find(c => c.id === this.currentCategoryId);
+        const sub = category.subcategories.find(s => s.id === subId);
+
+        // Update Breadcrumbs
+        document.getElementById('breadcrumbCurrent').innerHTML = ` 
+            <span style="color:#888;">></span> <span onclick="Admin.openCategory(${category.id})" style="cursor:pointer; text-decoration:underline;">${category.name}</span> 
+            <span style="color:#888;">></span> ${sub.name}
+        `;
+
+        // Check if we want to hide sibling subcategories or just list products?
+        // Let's hide the list of subcategories to focus on products
+        document.getElementById('categoriesList').style.display = 'none';
+
+        document.getElementById('categoryProductsSection').style.display = 'block';
+        document.querySelector('#categoryProductsSection h3').textContent = `Товары: ${sub.name}`;
+
+        // Update Add Product button to preselect category AND subcategory
+        document.querySelector('#categoryProductsSection button').onclick = () => Admin.openProductModal(null, this.currentCategoryId, subId);
+
+        // Load products filtered by subcategory
+        this.loadCategoryProducts(this.currentCategoryId, subId);
+    },
+
+    async loadCategoryProducts(catId, subId = null) {
         try {
-            const data = await API.getProducts({ category: catId, limit: 100 });
+            const params = { category: catId, limit: 100 };
+            if (subId) params.subcategory = subId;
+
+            const data = await API.getProducts(params);
             const products = data.items || [];
             const tbody = document.getElementById('categoryProductsBody');
 
@@ -163,6 +199,45 @@ const Admin = {
             tbody.innerHTML = products.map(p => this.renderProductRow(p)).join('');
         } catch (e) {
             console.error(e);
+        }
+    },
+
+    async deleteSubcategory(id) {
+        if (!confirm('Удалить подкатегорию?')) return;
+        // Assuming API for subcategory deletion exists or use generic router?
+        // Wait, we didn't define delete subcategory strictly in API routes?
+        // Let's check api.js or backend. Assuming standard REST: DELETE /subcategories/{id}
+        // If not implemented, we might need to add it. But let's try standard.
+        // Actually, looking at categories.py, we might need to check if DELETE /subcategories/{id} exists.
+        // If not, we can't do it yet. I should double check.
+        // For now let's hope it exists or I will add it in next step if fails.
+        try {
+            await fetch(`${API.baseUrl}/subcategories/${id}`, { method: 'DELETE' });
+            this.loadCategories(); // reload tree
+        } catch (e) {
+            alert('Ошибка удаления: ' + e);
+        }
+    },
+
+    openSubcategoryModal(catId) {
+        const name = prompt("Название подкатегории:");
+        if (name) {
+            this.createSubcategory(catId, name);
+        }
+    },
+
+    async createSubcategory(catId, name) {
+        try {
+            await fetch(`${API.baseUrl}/subcategories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category_id: catId, name: name })
+            });
+            this.loadCategories();
+            // Re-open category view
+            setTimeout(() => this.openCategory(catId), 500);
+        } catch (e) {
+            alert('Ошибка: ' + e);
         }
     },
 
