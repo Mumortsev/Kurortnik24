@@ -101,7 +101,7 @@ async def create_subcategory(category_id: int, name: str) -> Dict:
     return await api_request(
         "POST",
         f"/api/categories/{category_id}/subcategories",
-        data={"name": name, "order": 0}
+        data={"name": name, "order": 0, "category_id": category_id}
     )
 
 
