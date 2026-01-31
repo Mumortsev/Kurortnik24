@@ -6,12 +6,9 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from dotenv import load_dotenv
 
 from ..keyboards import get_main_menu_keyboard
 from ..utils import is_admin
-
-load_dotenv()
 
 router = Router()
 

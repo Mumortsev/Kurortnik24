@@ -1,0 +1,31 @@
+[2026-01-31 16:33:50] Parsing file: c:\Antigravity\Project\data\template_for_client.xlsx
+[2026-01-31 16:34:14] Parsing file: c:\Antigravity\Project\data\template_for_client.xlsx
+[2026-01-31 16:34:14]   Column mapping: {'name': None, 'description': 'Описание', 'price': 'Цена (за 1 шт/₽)', 'image_url': None, 'category': 'Подкатегория'}
+[2026-01-31 16:34:14]   Extracted 0 products
+[2026-01-31 16:34:14] No products found to upload
+[2026-01-31 16:35:35] Parsing file: c:\Antigravity\Project\data\template_for_client.xlsx
+[2026-01-31 16:35:36] Extracted 5 products
+[2026-01-31 16:35:36] Creating category: INTEX
+[2026-01-31 16:35:37] Error creating category INTEX: Internal Server Error
+[2026-01-31 16:35:37] Uploading: Матрас надувной 180х70
+[2026-01-31 16:35:37] Failed Матрас надувной 180х70: Internal Server Error
+[2026-01-31 16:35:38] Creating category: Маски, очки и ласты
+[2026-01-31 16:35:38] Error creating category Маски, очки и ласты: Internal Server Error
+[2026-01-31 16:35:38] Creating category: Магниты
+[2026-01-31 16:35:38] Error creating category Магниты: Internal Server Error
+[2026-01-31 16:35:39] Creating subcategory: Джубга
+[2026-01-31 16:35:39] Uploading: Магнит Корабль дерево
+[2026-01-31 16:35:39] Failed Магнит Корабль дерево: Internal Server Error
+[2026-01-31 16:37:03] Parsing file: c:\Antigravity\Project\data\template_for_client.xlsx
+[2026-01-31 16:37:04] Extracted 5 products
+[2026-01-31 16:37:04] Uploading: Круг морской 50см
+[2026-01-31 16:37:04] Failed Круг морской 50см: Internal Server Error
+[2026-01-31 16:37:04] Uploading: Матрас надувной 180х70
+[2026-01-31 16:37:05] Failed Матрас надувной 180х70: Internal Server Error
+[2026-01-31 16:37:05] Uploading: Маска Classic Синяя
+[2026-01-31 16:37:05] Failed Маска Classic Синяя: Internal Server Error
+[2026-01-31 16:37:06] Creating subcategory: Геленджик
+[2026-01-31 16:37:06] Uploading: Магнит Дельфин керамика
+[2026-01-31 16:37:06] Failed Магнит Дельфин керамика: Internal Server Error
+[2026-01-31 16:37:06] Uploading: Магнит Корабль дерево
+[2026-01-31 16:37:07] Failed Магнит Корабль дерево: Internal Server Error

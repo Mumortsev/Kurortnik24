@@ -20,6 +20,14 @@ WEBAPP_URL = os.getenv("WEBAPP_URL", "*")
 async def lifespan(app: FastAPI):
     """Initialize database on startup."""
     await init_db()
+    
+    # Run seeder
+    try:
+        from .seeder import seed_categories
+        await seed_categories()
+    except Exception as e:
+        print(f"Error seeding categories: {e}")
+        
     yield
 
 

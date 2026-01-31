@@ -2,7 +2,10 @@
 Products API routes with filtering, sorting, and pagination.
 """
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+import shutil
+import os
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
+from ..excel_processor import process_excel_import
 from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -138,6 +141,30 @@ async def create_product(
     db_product = result.scalar_one()
 
     return db_product
+
+
+@router.post("/import", response_model=MessageResponse)
+async def import_products(
+    file: UploadFile = File(...)
+):
+    """Import products from Excel file."""
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="Only Excel files are allowed")
+
+    # Save to temp file
+    temp_file = f"temp_{file.filename}"
+    try:
+        with open(temp_file, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        result_msg = await process_excel_import(temp_file)
+        return MessageResponse(message=result_msg)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+    finally:
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
 
 
 @router.put("/{product_id}", response_model=ProductResponse)
