@@ -3,9 +3,7 @@
  */
 const API = {
     // Base URL - change to your server
-    baseUrl: window.location.hostname === 'localhost'
-        ? 'http://localhost:8000/api'
-        : '/api',
+    baseUrl: 'https://backend-production-d050.up.railway.app/api',
 
     /**
      * Make API request
