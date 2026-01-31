@@ -49,6 +49,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# ... existing imports
+
+# After app definition and middleware...
+
 # Include routers
 app.include_router(categories.router)
 app.include_router(products.router)
@@ -56,17 +64,19 @@ app.include_router(orders.router)
 app.include_router(images.router)
 app.include_router(admin.router)
 
+# Serve Static Files (Frontend)
+# Create static directory if it doesn't exist to avoid errors locally
+os.makedirs("static", exist_ok=True)
 
-@app.get("/")
-async def root():
-    """Health check endpoint."""
-    return {"status": "ok", "message": "Telegram Shop API is running"}
-
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 @app.get("/health")
 async def health():
     """Health check for Docker."""
     return {"status": "healthy"}
+
+
+
 
 
 if __name__ == "__main__":
