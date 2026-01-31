@@ -420,13 +420,28 @@ async def process_excel_document(message: Message, state: FSMContext):
     
     await message.bot.download_file(file.file_path, file_path)
     
-    # Import logic
-    from api.excel_processor import process_excel_import
-    result_text = await process_excel_import(file_path)
-    
-    await state.clear()
-    await wait_msg.delete()
-    await message.answer(result_text, reply_markup=get_admin_menu_keyboard())
+    try:
+        # Import logic
+        from api.excel_processor import process_excel_import
+        result_text = await process_excel_import(file_path)
+        
+        await wait_msg.delete()
+        await message.answer(result_text, reply_markup=get_admin_menu_keyboard())
+        
+    except Exception as e:
+        await wait_msg.delete()
+        await message.answer(
+            f"❌ Произошла ошибка при обработке файла:\n{str(e)}", 
+            reply_markup=get_admin_menu_keyboard()
+        )
+    finally:
+        # Clean up file
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except:
+                pass
+        await state.clear()
 
 
 # --- Find Product ---
