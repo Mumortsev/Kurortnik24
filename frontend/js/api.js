@@ -3,7 +3,7 @@
  */
 const API = {
     // Base URL - change to your server
-    baseUrl: 'https://backend-production-d050.up.railway.app/api',
+    baseUrl: 'https://kurortnik24-production-7a2c.up.railway.app/api',
 
     /**
      * Make API request
