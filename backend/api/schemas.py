@@ -55,6 +55,8 @@ class ProductBase(BaseModel):
     price_per_unit: float = Field(..., gt=0)
     pieces_per_pack: int = Field(default=1, ge=1)
     min_order_packs: int = Field(default=1, ge=1)
+    sku: Optional[str] = None
+    country: Optional[str] = None
     image_url: Optional[str] = None
     image_file_id: Optional[str] = None
     in_stock: Optional[int] = None  # None = unlimited
@@ -73,6 +75,8 @@ class ProductUpdate(BaseModel):
     price_per_unit: Optional[float] = Field(default=None, gt=0)
     pieces_per_pack: Optional[int] = Field(default=None, ge=1)
     min_order_packs: Optional[int] = Field(default=None, ge=1)
+    sku: Optional[str] = None
+    country: Optional[str] = None
     category_id: Optional[int] = None
     subcategory_id: Optional[int] = None
     image_url: Optional[str] = None

@@ -83,6 +83,9 @@ class Product(Base):
     pieces_per_pack: Mapped[int] = mapped_column(Integer, default=1)
     min_order_packs: Mapped[int] = mapped_column(Integer, default=1)
     
+    sku: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    country: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    
     # Images (Deprecated single image fields, kept for backward compatibility)
     image_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
     image_file_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
