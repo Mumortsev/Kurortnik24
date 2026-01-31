@@ -23,8 +23,17 @@ def get_main_menu_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
 def get_admin_menu_keyboard() -> InlineKeyboardMarkup:
     """Admin panel main menu."""
     builder = InlineKeyboardBuilder()
+    
+    # New Web Admin Panel
+    from aiogram.types import WebAppInfo
+    web_app_url = "https://kurortnik-24.netlify.app/admin.html" # Should match your netlify + admin.html
+    
     builder.row(
-        InlineKeyboardButton(text="➕ Добавить товар", callback_data="admin:add_product")
+        InlineKeyboardButton(text="🌐 Открыть WEB Админ-панель", web_app=WebAppInfo(url=web_app_url))
+    )
+    
+    builder.row(
+        InlineKeyboardButton(text="➕ Добавить товар (Бот)", callback_data="admin:add_product")
     )
     builder.row(
         InlineKeyboardButton(text="🔍 Найти товар", callback_data="admin:find_product")
