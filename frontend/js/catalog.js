@@ -120,9 +120,7 @@ const Catalog = {
         // Category chips
         this.categories.forEach(cat => {
             const isActive = this.currentCategory === cat.id;
-            const icon = this.getCategoryIcon(cat.name);
             html += `<button class="category-chip ${isActive ? 'active' : ''}" data-id="${cat.id}">
-                ${icon}
                 ${cat.name}
             </button>`;
         });
@@ -133,28 +131,6 @@ const Catalog = {
         container.querySelectorAll('.category-chip').forEach(chip => {
             chip.addEventListener('click', () => this.selectCategory(chip.dataset.id));
         });
-    },
-
-    /**
-     * Get icon for category
-     */
-    getCategoryIcon(categoryName) {
-        const icons = {
-            'Зонты': '🏖️',
-            'Маски': '🤿',
-            'Ласты': '🦈',
-            'Обувь': '👟',
-            'Палатки': '⛺',
-            'Катаны': '⚔️',
-            'Сачки': '🎣'
-        };
-
-        for (const [key, icon] of Object.entries(icons)) {
-            if (categoryName.toLowerCase().includes(key.toLowerCase())) {
-                return icon;
-            }
-        }
-        return '';
     },
 
     /**
