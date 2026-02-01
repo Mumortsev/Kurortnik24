@@ -585,6 +585,9 @@ body {
     align-items: flex-end;
     pointer-events: none;
     /* Let clicks pass through container */
+    z-index: 10;
+    /* Ensure above other elements */
+    width: 100%;
 }
 
 .card-actions>* {
@@ -620,11 +623,18 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
+    /* More opaque */
     backdrop-filter: blur(4px);
     border-radius: 20px;
     padding: 4px 8px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Stronger shadow */
+    pointer-events: auto;
+    /* Ensure clickable */
+    z-index: 20;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Subtle border */
 }
 
 .card-qty-btn {
