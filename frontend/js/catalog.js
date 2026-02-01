@@ -322,14 +322,12 @@ const Catalog = {
                     <div class="product-pack">${product.pieces_per_pack} шт/пач</div>
                     
                     <div class="card-actions" onclick="event.stopPropagation();">
-                        <!-- Left: Quantity Controls (only if in cart) -->
-                        ${qtyInCart > 0 ? `
+                        <!-- Left: Quantity Controls (Always visible) -->
                         <div class="card-qty-controls">
-                            <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${product.id}, -1)">−</button>
+                            <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${product.id}, -1)" ${qtyInCart === 0 ? 'disabled style="opacity:0.5; cursor: default;"' : ''}>−</button>
                             <span class="card-qty" id="grid-qty-${product.id}">${qtyInCart}</span>
                             <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${product.id}, 1)">+</button>
                         </div>
-                        ` : '<div></div>'}
 
                         <!-- Right: Cart Button -->
                         <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${product.id})">
@@ -414,13 +412,11 @@ const Catalog = {
         const qtyInCart = this.getProductQtyInCart(productId);
 
         controlsContainer.innerHTML = `
-            ${qtyInCart > 0 ? `
             <div class="card-qty-controls">
-                <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${productId}, -1)">−</button>
+                <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${productId}, -1)" ${qtyInCart === 0 ? 'disabled style="opacity:0.5; cursor: default;"' : ''}>−</button>
                 <span class="card-qty" id="grid-qty-${productId}">${qtyInCart}</span>
                 <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${productId}, 1)">+</button>
             </div>
-            ` : '<div></div>'}
 
             <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${productId})">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
