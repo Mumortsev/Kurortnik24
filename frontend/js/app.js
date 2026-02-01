@@ -344,19 +344,32 @@ const App = {
 
             document.getElementById('ordersEmpty').style.display = 'none';
 
-            const html = ordersList.map(order => `
+            const html = ordersList.map(order => {
+                const itemsHtml = order.items.map(item => `
+                    <div class="order-item-row">
+                        <span>${item.product_name} x ${item.quantity_packs}</span>
+                        <span>${item.subtotal}₽</span>
+                    </div>
+                `).join('');
+
+                return `
                 <div class="order-card">
                     <div class="order-header">
                         <span class="order-id">Заказ #${order.id}</span>
                         <span class="order-status ${order.status}">${this.getStatusLabel(order.status)}</span>
                     </div>
-                    <div class="order-items">${order.items?.length || 0} товар(ов)</div>
+                    <div class="order-items-list">
+                        ${itemsHtml}
+                    </div>
                     <div class="order-footer">
+                        <span class="order-total-label">Итого:</span>
                         <span class="order-total">${order.total_amount || order.total}₽</span>
+                    </div>
+                     <div class="order-date-row">
                         <span class="order-date">${this.formatDate(order.created_at)}</span>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
 
             document.getElementById('ordersList').innerHTML = html;
         } catch (error) {
@@ -403,7 +416,9 @@ const App = {
 
         // Toggle header visibility
         const header = document.querySelector('.header');
-        if (viewId === 'checkoutView') {
+        const hideHeaderViews = ['checkoutView', 'cartView', 'profileView'];
+
+        if (hideHeaderViews.includes(viewId)) {
             header.style.display = 'none';
         } else {
             header.style.display = 'block';
