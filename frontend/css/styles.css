@@ -123,7 +123,7 @@ body {
 }
 
 .main-content.no-header {
-    padding-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg) !important;
     /* Much smaller padding when header is hidden */
 }
 
