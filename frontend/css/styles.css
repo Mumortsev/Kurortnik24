@@ -116,7 +116,15 @@ body {
     /* Add header height + extra spacing */
     padding-top: calc(var(--header-height) + var(--spacing-xl));
     padding-bottom: calc(var(--bottom-nav-height) + var(--spacing-lg));
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
     min-height: 100vh;
+    transition: padding-top 0.3s ease;
+}
+
+.main-content.no-header {
+    padding-top: var(--spacing-lg);
+    /* Much smaller padding when header is hidden */
 }
 
 .header-top {
