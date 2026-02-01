@@ -13,7 +13,7 @@ from ..schemas import (
     CartValidateRequest, CartValidateResponse, CartValidateError,
     OrderCreate, OrderResponse, OrderListResponse, MessageResponse
 )
-# from ..notifier import notify_new_order
+from ..notifier import notify_new_order
 
 router = APIRouter(prefix="/api", tags=["orders"])
 
@@ -173,14 +173,14 @@ async def create_order(
         items_data.append(item_dict)
         
     # Send notification in background
-    # order_info = {
-    #     "id": order.id,
-    #     "customer_name": order.customer_name,
-    #     "customer_organization": order.customer_organization,
-    #     "customer_phone": order.customer_phone,
-    #     "total_amount": float(order.total_amount)
-    # }
-    # background_tasks.add_task(notify_new_order, order_info, items_data)
+    order_info = {
+        "id": order.id,
+        "customer_name": order.customer_name,
+        "customer_organization": order.customer_organization,
+        "customer_phone": order.customer_phone,
+        "total_amount": float(order.total_amount)
+    }
+    background_tasks.add_task(notify_new_order, order_info, items_data)
     
     return order_response
 
