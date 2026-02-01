@@ -42,15 +42,28 @@
                 </div>
             </div>
 
-            <!-- Search -->
-            <div class="search-container" id="searchContainer">
-                <svg class="search-icon" id="searchBtn" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" style="cursor: pointer;">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="M21 21l-4.35-4.35" />
-                </svg>
-                <input type="text" class="search-input" id="searchInput" placeholder="Поиск">
-                <button class="search-clear" id="searchClear" style="display: none;">×</button>
+            <!-- Search & Sort Row -->
+            <div class="header-controls">
+                <div class="search-container" id="searchContainer">
+                    <svg class="search-icon" id="searchBtn" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Поиск">
+                    <button class="search-clear" id="searchClear" style="display: none;">×</button>
+                </div>
+
+                <div class="sort-container">
+                    <select class="sort-select" id="sortSelect">
+                        <option value="newest">Новые</option>
+                        <option value="oldest">Старые</option>
+                        <option value="price_asc">Цена ↑</option>
+                        <option value="price_desc">Цена ↓</option>
+                        <option value="name_asc">А-Я</option>
+                        <option value="name_desc">Я-А</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Categories -->
@@ -68,18 +81,6 @@
         <main class="main-content" id="mainContent">
             <!-- Products View (default) -->
             <div class="view" id="productsView">
-                <!-- Sort -->
-                <div class="sort-container">
-                    <select class="sort-select" id="sortSelect">
-                        <option value="newest">Сначала новые</option>
-                        <option value="oldest">Сначала старые</option>
-                        <option value="price_asc">Цена ↑</option>
-                        <option value="price_desc">Цена ↓</option>
-                        <option value="name_asc">А-Я</option>
-                        <option value="name_desc">Я-А</option>
-                    </select>
-                </div>
-
                 <!-- Products Grid -->
                 <div class="products-grid" id="productsGrid">
                     <!-- Products loaded here -->
