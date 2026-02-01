@@ -12,6 +12,7 @@ const Catalog = {
     searchQuery: '',
     sortBy: 'newest',
     products: [],
+    localQuantities: {}, // Track local selection for cards
 
     // Config
     itemsPerPage: 12,
@@ -322,11 +323,11 @@ const Catalog = {
                     <div class="product-pack">${product.pieces_per_pack} шт/пач</div>
                     
                     <div class="card-actions" onclick="event.stopPropagation();">
-                        <!-- Left: Quantity Controls (Always visible) -->
+                        <!-- Left: Quantity Controls (Local Selection) -->
                         <div class="card-qty-controls">
-                            <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${product.id}, -1)" ${qtyInCart === 0 ? 'disabled style="opacity:0.5; cursor: default;"' : ''}>−</button>
-                            <span class="card-qty" id="grid-qty-${product.id}">${qtyInCart}</span>
-                            <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${product.id}, 1)">+</button>
+                            <button class="card-qty-btn small" onclick="Catalog.adjustLocalQty(${product.id}, -1)">−</button>
+                            <span class="card-qty" id="grid-qty-${product.id}">${this.localQuantities[product.id] || 1}</span>
+                            <button class="card-qty-btn small" onclick="Catalog.adjustLocalQty(${product.id}, 1)">+</button>
                         </div>
 
                         <!-- Right: Cart Button -->
@@ -361,71 +362,51 @@ const Catalog = {
     },
 
     /**
-     * Add to cart from card
+     * Add to cart from card (using local selection)
      */
     addToCartFromCard(productId) {
         const product = this.products.find(p => p.id === productId);
         if (!product) return;
 
-        Cart.addProduct(product, 1);
+        const qtyToAdd = this.localQuantities[productId] || 1;
+
+        Cart.addProduct(product, qtyToAdd);
         App.updateCartBadge();
 
-        // Re-render the card to show qty controls
+        // Optional: Reset local counter to 1 for visual feedback? 
+        // Or keep it? User might want to add again. 
+        // I'll reset it to 1 to signify "transaction complete"
+        this.localQuantities[productId] = 1;
         this.refreshCardControls(productId);
     },
 
     /**
-     * Update card quantity
+     * Adjust local quantity on card
      */
-    updateCardQty(productId, delta) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-
-        const currentPacks = this.getProductQtyInCart(productId);
-        const newPacks = currentPacks + delta;
-
-        if (newPacks <= 0) {
-            Cart.removeItem(productId);
-        } else {
-            if (currentPacks === 0) {
-                Cart.addProduct(product, newPacks);
-            } else {
-                Cart.updateQuantity(productId, newPacks);
-            }
+    adjustLocalQty(productId, delta) {
+        if (!this.localQuantities[productId]) {
+            this.localQuantities[productId] = 1;
         }
 
-        App.updateCartBadge();
+        const current = this.localQuantities[productId];
+        const product = this.products.find(p => p.id === productId);
+        const min = product?.min_order_packs || 1;
+
+        let newQty = current + delta;
+        if (newQty < min) newQty = min;
+
+        this.localQuantities[productId] = newQty;
         this.refreshCardControls(productId);
     },
 
     /**
-     * Refresh card controls after qty change
+     * Refresh card controls
      */
     refreshCardControls(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-
-        const card = document.querySelector(`.product-card[data-id="${productId}"]`);
-        if (!card) return;
-
-        const controlsContainer = card.querySelector('.card-actions');
-        const qtyInCart = this.getProductQtyInCart(productId);
-
-        controlsContainer.innerHTML = `
-            <div class="card-qty-controls">
-                <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${productId}, -1)" ${qtyInCart === 0 ? 'disabled style="opacity:0.5; cursor: default;"' : ''}>−</button>
-                <span class="card-qty" id="grid-qty-${productId}">${qtyInCart}</span>
-                <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${productId}, 1)">+</button>
-            </div>
-
-            <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${productId})">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
-                    <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
-                    <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
-                </svg>
-            </button>
-        `;
+        const qtyDisplay = document.getElementById(`grid-qty-${productId}`);
+        if (qtyDisplay) {
+            qtyDisplay.textContent = this.localQuantities[productId] || 1;
+        }
     },
 
     /**
