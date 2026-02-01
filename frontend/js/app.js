@@ -622,12 +622,10 @@ const App = {
         }
 
         const orderData = {
-            telegram_id: this.user?.id || null,
+            telegram_user_id: this.user?.id || 0,
             customer_name: name,
             customer_phone: phone,
-            customer_type: customerType,
-            customer_org: orgName || null,
-            comment: comment || null,
+            customer_organization: orgName || null,
             items: items.map(item => ({
                 product_id: item.product.id,
                 quantity_packs: item.packs
