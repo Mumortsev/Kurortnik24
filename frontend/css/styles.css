@@ -438,10 +438,7 @@ body {
     position: relative;
 }
 
-.product-card:active {
-    transform: scale(0.98);
-    box-shadow: var(--shadow-md);
-}
+
 
 /* Product Badge */
 .product-badge {
