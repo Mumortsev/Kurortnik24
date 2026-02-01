@@ -158,10 +158,7 @@ const App = {
             });
         });
 
-        // Favorites button (placeholder - just show toast)
-        document.getElementById('navFavorites').addEventListener('click', () => {
-            this.showToast('Избранное скоро будет доступно');
-        });
+
     },
 
     /**

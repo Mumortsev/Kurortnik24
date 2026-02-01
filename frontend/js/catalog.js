@@ -114,7 +114,7 @@ const Catalog = {
                 <circle cx="12" cy="12" r="3"/>
                 <circle cx="19" cy="12" r="3"/>
             </svg>
-            All
+            Все товары
         </button>`;
 
         // Category chips
