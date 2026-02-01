@@ -18,51 +18,31 @@
     <div id="app">
         <!-- Header -->
         <header class="header">
-            <!-- Logo -->
-            <div class="logo-container">
-                <img src="assets/logo.png" alt="Курортник" class="logo" id="logo" onerror="this.style.display='none'">
-            </div>
-
-            <!-- Welcome & Actions -->
+            <!-- Header items in one row -->
             <div class="header-top">
-                <div class="welcome-message" id="welcomeMessage">Добро пожаловать!</div>
-                <div class="header-actions">
-                    <button class="header-btn" id="cartBtnHeader" title="Корзина">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path
-                                d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
-                            <path
-                                d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
-                            <path
-                                d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
-                        </svg>
-                        <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Search & Sort Row -->
-            <div class="header-controls">
-                <div class="search-container" id="searchContainer">
-                    <svg class="search-icon" id="searchBtn" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="M21 21l-4.35-4.35" />
-                    </svg>
-                    <input type="text" class="search-input" id="searchInput" placeholder="Поиск">
-                    <button class="search-clear" id="searchClear" style="display: none;">×</button>
+                <!-- Logo Left -->
+                <div class="logo-container">
+                    <img src="assets/logo.png" alt="Курортник" class="logo" id="logo"
+                        onerror="this.style.display='none'">
                 </div>
 
-                <div class="sort-container">
-                    <select class="sort-select" id="sortSelect">
-                        <option value="newest">Новые</option>
-                        <option value="oldest">Старые</option>
-                        <option value="price_asc">Цена ↑</option>
-                        <option value="price_desc">Цена ↓</option>
-                        <option value="name_asc">А-Я</option>
-                        <option value="name_desc">Я-А</option>
-                    </select>
+                <!-- Welcome Right -->
+                <div class="header-right">
+                    <div class="welcome-message" id="welcomeMessage">Добро пожаловать!</div>
+                    <div class="header-actions">
+                        <button class="header-btn" id="cartBtnHeader" title="Корзина">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
+                                <path
+                                    d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
+                                <path
+                                    d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
+                            </svg>
+                            <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -81,6 +61,30 @@
         <main class="main-content" id="mainContent">
             <!-- Products View (default) -->
             <div class="view" id="productsView">
+                <!-- Search & Sort Row (Moved from Header) -->
+                <div class="header-controls">
+                    <div class="search-container" id="searchContainer">
+                        <svg class="search-icon" id="searchBtn" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Поиск">
+                        <button class="search-clear" id="searchClear" style="display: none;">×</button>
+                    </div>
+
+                    <div class="sort-container">
+                        <select class="sort-select" id="sortSelect">
+                            <option value="newest">Новые</option>
+                            <option value="oldest">Старые</option>
+                            <option value="price_asc">Цена ↑</option>
+                            <option value="price_desc">Цена ↓</option>
+                            <option value="name_asc">А-Я</option>
+                            <option value="name_desc">Я-А</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Products Grid -->
                 <div class="products-grid" id="productsGrid">
                     <!-- Products loaded here -->

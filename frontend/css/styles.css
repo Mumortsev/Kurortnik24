@@ -107,26 +107,32 @@ body {
     z-index: 100;
     background: var(--bg-secondary);
     padding: var(--spacing-md);
+    /* Header height - Reduced for cleaner look */
+    --header-height: 140px;
     padding-top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px));
 }
 
 .header-top {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Horizontal layout */
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    /* Space between logo and right controls */
     margin-bottom: var(--spacing-sm);
     position: relative;
-    padding-right: 50px;
-    /* Space for absolute cart button */
+    padding-right: 0;
 }
 
 /* Welcome message */
 .welcome-message {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 14px;
+    /* Smaller font */
+    font-weight: 500;
     color: var(--text-primary);
     letter-spacing: -0.5px;
+    text-align: right;
+    margin-bottom: 0;
 }
 
 .header-actions {
@@ -135,8 +141,8 @@ body {
 }
 
 .header-btn {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border: none;
     background: var(--bg-primary);
     color: var(--text-primary);
@@ -146,9 +152,8 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all var(--transition-fast);
-    position: absolute;
-    right: 0;
-    top: 0;
+    position: static;
+    /* No longer absolute */
 }
 
 .header-btn:active {
@@ -174,14 +179,7 @@ body {
     border: 2px solid var(--bg-secondary);
 }
 
-/* Logo Container */
-.logo-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: var(--spacing-sm);
-}
+
 
 .logo {
     height: 50px;
