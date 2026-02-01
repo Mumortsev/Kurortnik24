@@ -398,6 +398,14 @@ const App = {
             this.currentView = viewId;
         }
 
+        // Toggle header visibility
+        const header = document.querySelector('.header');
+        if (viewId === 'checkoutView') {
+            header.style.display = 'none';
+        } else {
+            header.style.display = 'block';
+        }
+
         // Update back button
         this.updateBackButton();
 
