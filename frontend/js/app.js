@@ -411,12 +411,15 @@ const App = {
 
         // Toggle header visibility
         const header = document.querySelector('.header');
+        const mainContent = document.getElementById('mainContent');
         const hideHeaderViews = ['checkoutView', 'cartView', 'profileView'];
 
         if (hideHeaderViews.includes(viewId)) {
             header.style.display = 'none';
+            mainContent.classList.add('no-header');
         } else {
             header.style.display = 'block';
+            mainContent.classList.remove('no-header');
         }
 
         // Update back button
