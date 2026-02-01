@@ -308,36 +308,37 @@ const Catalog = {
             return `
             <div class="product-card" data-id="${product.id}">
                 ${badgeHtml}
-                <img 
-                    class="product-image skeleton" 
-                    src="${API.getImageUrl(product.image, 'small')}"
-                    alt="${product.name}"
-                    onload="this.classList.remove('skeleton'); this.classList.add('loaded');"
-                    onerror="this.onerror=null; this.classList.remove('skeleton'); this.classList.add('loaded'); this.src='assets/placeholder.svg'"
-                >
+                <div class="product-image-wrapper">
+                    <img 
+                        class="product-image skeleton" 
+                        src="${API.getImageUrl(product.image, 'small')}"
+                        alt="${product.name}"
+                        onload="this.classList.remove('skeleton'); this.classList.add('loaded');"
+                        onerror="this.onerror=null; this.classList.remove('skeleton'); this.classList.add('loaded'); this.src='assets/placeholder.svg'"
+                    >
+                    <!-- Cart Button on Image (Bottom Right) -->
+                    <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${product.id}); event.stopPropagation();">
+                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
+                            <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
+                        </svg>
+                    </button>
+                </div>
+                
                 <div class="product-info">
                     <div class="product-name">${product.name}</div>
-                    <div class="product-price-row">
-                        <div class="product-price">${this.formatPrice(product.price_per_unit)}<span class="currency">₽</span></div>
-                    </div>
                     <div class="product-pack">${product.pieces_per_pack} шт/пач</div>
                     
-                    <div class="card-actions" onclick="event.stopPropagation();">
-                        <!-- Left: Quantity Controls (Local Selection) -->
-                        <div class="card-qty-controls">
-                            <button class="card-qty-btn small" onclick="Catalog.adjustLocalQty(${product.id}, -1)">−</button>
+                    <div class="product-footer">
+                        <div class="product-price">${this.formatPrice(product.price_per_unit)}<span class="currency">₽</span></div>
+                        
+                        <!-- Quantity Controls (Right) -->
+                        <div class="card-qty-controls" onclick="event.stopPropagation();">
+                            <button class="card-qty-btn" onclick="Catalog.adjustLocalQty(${product.id}, -1)">−</button>
                             <span class="card-qty" id="grid-qty-${product.id}">${this.localQuantities[product.id] || 1}</span>
-                            <button class="card-qty-btn small" onclick="Catalog.adjustLocalQty(${product.id}, 1)">+</button>
+                            <button class="card-qty-btn" onclick="Catalog.adjustLocalQty(${product.id}, 1)">+</button>
                         </div>
-
-                        <!-- Right: Cart Button -->
-                        <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${product.id})">
-                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
-                                <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
-                                <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
-                            </svg>
-                        </button>
                     </div>
                 </div>
             </div>
