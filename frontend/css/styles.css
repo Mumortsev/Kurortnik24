@@ -1284,10 +1284,16 @@ body {
 .nav-pill {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    /* Spread items */
+    width: 100%;
+    /* Full width */
+    max-width: 400px;
+    /* Max width constraint for tablets */
     background: var(--bg-primary);
     border-radius: var(--border-radius-full);
-    padding: 8px 12px;
+    padding: 8px 16px;
+    /* Increased padding */
 }
 
 .nav-item {
