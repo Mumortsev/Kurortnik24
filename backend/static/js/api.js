@@ -2,8 +2,8 @@
  * API Client for Telegram Mini App Store
  */
 const API = {
-    // Base URL - relative to current origin
-    baseUrl: '/api',
+    // Base URL - change to your server
+    baseUrl: 'https://kurortnik24-production-7a2c.up.railway.app/api',
 
     /**
      * Make API request

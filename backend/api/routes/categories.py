@@ -105,11 +105,14 @@ async def delete_category(category_id: int, db: AsyncSession = Depends(get_db)):
     if not db_category:
         raise HTTPException(status_code=404, detail="Категория не найдена")
     
+    # Cascade delete products? Or just delete them?
+    # SQLAlchemy cascade might handle this if configured, but let's be explicit or rely on DB.
+    # If we want to allow deleting category with products, we should delete products first or set cascade.
+    
     if db_category.products:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Нельзя удалить категорию: в ней {len(db_category.products)} товаров"
-        )
+        # Delete products
+        for product in db_category.products:
+            await db.delete(product)
     
     await db.delete(db_category)
     await db.commit()

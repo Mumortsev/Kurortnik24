@@ -7,8 +7,6 @@
     <title>Админ-панель</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/admin.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -18,14 +16,15 @@
     <div id="adminApp">
         <header class="admin-header">
             <div class="header-title">
-                <h2>Администратор</h2>
+                <h2>Админ-панель</h2>
                 <div class="user-info" id="adminUserInfo">Загрузка...</div>
             </div>
         </header>
 
         <nav class="admin-nav">
-            <button class="nav-btn active" data-tab="products">📦 Товары</button>
-            <button class="nav-btn" data-tab="upload">📥 Загрузить из Excel</button>
+            <button class="nav-btn active" data-tab="categories">📁 Категории</button>
+            <button class="nav-btn" data-tab="products">📦 Все товары</button>
+            <button class="nav-btn" data-tab="upload">📥 Импорт</button>
         </nav>
 
         <main class="admin-content">
@@ -35,20 +34,63 @@
                 <p>Вы не являетесь администратором.</p>
             </div>
 
-            <!-- Products Tab -->
-            <div id="productsTab" class="tab-content active">
-                <div class="info-card">
-                    <p>Здесь список всех ваших товаров. Вы можете удалить ненужные или проверить цены.</p>
-                    <p>Чтобы добавить много товаров сразу, используйте вкладку <b>"Загрузить из Excel"</b>.</p>
+            <!-- Categories Tab -->
+            <div id="categoriesTab" class="tab-content active">
+                <div class="section-header">
+                    <h3>Структура каталога</h3>
+                    <button class="btn btn-primary" onclick="Admin.openCategoryModal()">+ Категория</button>
+                </div>
+                <!-- Breadcrumbs -->
+                <div id="breadcrumbs" class="breadcrumbs" style="display:none;">
+                    <span onclick="Admin.loadCategories()"
+                        style="cursor:pointer; color:var(--primary-color);">Главная</span>
+                    <span id="breadcrumbCurrent"> > Текущая</span>
                 </div>
 
+                <div id="categoriesList" class="grid-list">
+                    <!-- Categories loaded here -->
+                </div>
+
+                <div id="categoryProductsSection" style="display:none; margin-top: 30px;">
+                    <div class="section-header">
+                        <h3>Товары в этой категории</h3>
+                        <button class="btn btn-sm btn-primary"
+                            onclick="Admin.openProductModal(null, Admin.currentCategoryId)">+ Товар</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">Фото</th>
+                                    <th>Товар</th>
+                                    <th>Цена</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryProductsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Tab (All) -->
+            <div id="productsTab" class="tab-content">
+                <div class="section-header">
+                    <h3>Все товары</h3>
+                    <button class="btn btn-primary" onclick="Admin.openProductModal()">+ Товар</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="productSearch" placeholder="Поиск по названию..."
+                        oninput="Admin.searchProducts(this.value)">
+                </div>
                 <div class="table-container">
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th width="60">Фото</th>
-                                <th>Название и Цена</th>
-                                <th width="80" style="text-align: center;">Удалить</th>
+                                <th width="50">Фото</th>
+                                <th>Товар</th>
+                                <th>Артикул</th>
+                                <th>Действия</th>
                             </tr>
                         </thead>
                         <tbody id="productsTableBody">
@@ -59,30 +101,82 @@
             </div>
 
             <!-- Upload Tab -->
-            <div id="uploadTab" class="tab-content" style="display: none;">
+            <div id="uploadTab" class="tab-content">
                 <div class="instruction-step">
                     <span class="step-number">1</span>
                     <p>Подготовьте файл Excel (таблицу) с товарами.</p>
-                    <a href="#" class="download-link" id="downloadTemplate"
-                        onclick="alert('Шаблон можно попросить у разработчика или использовать тот, что был прислан ранее.')">Скачать
-                        пример таблицы</a>
                 </div>
-
-                <div class="instruction-step">
-                    <span class="step-number">2</span>
-                    <p>Нажмите на область ниже и выберите ваш файл.</p>
-                </div>
-
                 <div class="upload-zone" id="dropZone">
                     <div class="upload-icon">📥</div>
-                    <h3>Нажмите сюда, чтобы загрузить файл</h3>
-                    <p>или перетащите файл в это окно</p>
+                    <h3>Загрузить файл Excel</h3>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
                 </div>
-
                 <div class="upload-status" id="uploadStatus"></div>
             </div>
         </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <h3 id="catModalTitle">Создать категорию</h3>
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" id="catNameInput" class="form-control">
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="Admin.closeModal('categoryModal')">Отмена</button>
+                <button class="btn btn-primary" onclick="Admin.saveCategory()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content modal-lg">
+            <h3 id="prodModalTitle">Товар</h3>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Название *</label>
+                    <input type="text" id="prodName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Категория *</label>
+                    <select id="prodCategory" class="form-control" onchange="Admin.onCategoryChange()"></select>
+                </div>
+                <div class="form-group">
+                    <label>Подкатегория</label>
+                    <select id="prodSubcategory" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label>Цена за шт (₽) *</label>
+                    <input type="number" id="prodPrice" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Штук в пачке *</label>
+                    <input type="number" id="prodPack" class="form-control" value="1">
+                </div>
+                <div class="form-group">
+                    <label>Остаток (пачек)</label>
+                    <input type="number" id="prodStock" class="form-control" placeholder="Пусто = ∞">
+                </div>
+                <div class="form-group">
+                    <label>Артикул</label>
+                    <input type="text" id="prodSku" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Страна</label>
+                    <input type="text" id="prodCountry" class="form-control">
+                </div>
+                <div class="form-group full-width">
+                    <label>Описание</label>
+                    <textarea id="prodDesc" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="Admin.closeModal('productModal')">Отмена</button>
+                <button class="btn btn-primary" onclick="Admin.saveProduct()">Сохранить</button>
+            </div>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
