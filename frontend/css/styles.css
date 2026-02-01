@@ -50,8 +50,8 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
 
-    /* Header height - Compact */
-    --header-height: 120px;
+    /* Header height - Logo + Search + Categories */
+    --header-height: 190px;
 
     /* Bottom nav height */
     --bottom-nav-height: 70px;
@@ -101,6 +101,8 @@ body {
    ===================================================== */
 .header {
     position: fixed;
+    /* Header height - Accommodate Logo Row + Search Row + Categories */
+    --header-height: 190px;
     top: 0;
     left: 0;
     right: 0;
@@ -117,8 +119,9 @@ body {
     /* Center vertically */
     justify-content: space-between;
     margin-bottom: var(--spacing-sm);
+    /* Space between logo row and search row */
     padding-right: 0;
-    height: 40px;
+    height: 50px;
     /* Fixed height for alignment */
 }
 
@@ -130,8 +133,8 @@ body {
 }
 
 .logo {
-    height: 32px;
-    /* Slightly smaller logo */
+    height: 44px;
+    /* Increased back to reasonable size */
     width: auto;
     object-fit: contain;
 }
@@ -207,11 +210,9 @@ body {
 
 .header-controls {
     display: flex;
-    gap: 16px;
-    /* Increased gap to separate inputs */
-    margin-bottom: var(--spacing-md);
-    margin-top: -10px;
-    /* Pull closer to header */
+    gap: 12px;
+    margin-bottom: var(--spacing-sm);
+    margin-top: 0;
 }
 
 .search-container {
