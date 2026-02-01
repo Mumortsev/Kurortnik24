@@ -78,11 +78,6 @@ const App = {
      * Setup event listeners
      */
     setupEventListeners() {
-        // Header cart button
-        document.getElementById('cartBtnHeader').addEventListener('click', () => {
-            this.showCart();
-        });
-
         // Back buttons
         document.getElementById('productBackBtn').addEventListener('click', () => this.showCatalog());
         document.getElementById('cartBackBtn').addEventListener('click', () => this.showCatalog());
