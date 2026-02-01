@@ -327,6 +327,8 @@ const Admin = {
         }
     },
 
+    currentProductImages: [], // Store file_ids
+
     async openProductModal(prodId = null, preselectCatId = null) {
         this.editingProductId = prodId;
         document.getElementById('prodModalTitle').textContent = prodId ? 'Редактировать товар' : 'Новый товар';
@@ -339,6 +341,9 @@ const Admin = {
         document.getElementById('prodSku').value = '';
         document.getElementById('prodCountry').value = '';
         document.getElementById('prodDesc').value = '';
+
+        this.currentProductImages = [];
+        this.renderProductImages();
 
         // Load categories into select
         const catSelect = document.getElementById('prodCategory');
@@ -368,9 +373,60 @@ const Admin = {
             if (p.subcategory_id) {
                 document.getElementById('prodSubcategory').value = p.subcategory_id;
             }
+
+            // Load images
+            if (p.images && p.images.length > 0) {
+                this.currentProductImages = p.images.map(img => img.file_id || img.image_url);
+            } else if (p.image_file_id) {
+                this.currentProductImages = [p.image_file_id];
+            } else if (p.image_url) {
+                this.currentProductImages = [p.image_url];
+            }
+            this.renderProductImages();
         }
 
         document.getElementById('productModal').classList.add('active');
+    },
+
+    renderProductImages() {
+        const container = document.getElementById('prodImagesList');
+        container.innerHTML = this.currentProductImages.map((img, index) => `
+            <div style="position: relative; width: 60px; height: 60px;">
+                <img src="${API.getImageUrl(img, 'small')}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                <button onclick="Admin.removeImage(${index})" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; line-height: 18px; cursor: pointer; font-size: 12px;">×</button>
+            </div>
+        `).join('');
+    },
+
+    removeImage(index) {
+        this.currentProductImages.splice(index, 1);
+        this.renderProductImages();
+    },
+
+    async handleImageUpload(files) {
+        if (!files || files.length === 0) return;
+
+        for (let i = 0; i < files.length; i++) {
+            const formData = new FormData();
+            formData.append('file', files[i]);
+
+            try {
+                const response = await fetch(`${API.baseUrl}/images/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.file_id) {
+                    this.currentProductImages.push(data.file_id);
+                }
+            } catch (e) {
+                console.error("Upload failed", e);
+                alert("Ошибка загрузки фото");
+            }
+        }
+        this.renderProductImages();
+        // Clear input so same file can be selected again
+        document.getElementById('prodImageUpload').value = '';
     },
 
     onCategoryChange() {
@@ -396,7 +452,8 @@ const Admin = {
             in_stock: document.getElementById('prodStock').value ? parseInt(document.getElementById('prodStock').value) : null,
             sku: document.getElementById('prodSku').value,
             country: document.getElementById('prodCountry').value,
-            description: document.getElementById('prodDesc').value
+            description: document.getElementById('prodDesc').value,
+            images: this.currentProductImages
         };
 
         if (!data.name || !data.category_id || isNaN(data.price_per_unit)) {

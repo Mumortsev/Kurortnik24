@@ -168,6 +168,17 @@
                     <input type="text" id="prodCountry" class="form-control">
                 </div>
                 <div class="form-group full-width">
+                    <label>Фотографии</label>
+                    <div id="prodImagesList" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                        <!-- Images rendered here -->
+                    </div>
+                    <label for="prodImageUpload" class="upload-btn-interactive">
+                        + Добавить фото
+                    </label>
+                    <input type="file" id="prodImageUpload" accept="image/*" hidden multiple
+                        onchange="Admin.handleImageUpload(this.files)">
+                </div>
+                <div class="form-group full-width">
                     <label>Описание</label>
                     <textarea id="prodDesc" class="form-control" rows="3"></textarea>
                 </div>

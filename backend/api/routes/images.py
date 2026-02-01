@@ -3,7 +3,7 @@ Image proxy route for serving Telegram images.
 """
 import os
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 
@@ -61,3 +61,29 @@ async def get_image(file_id: str):
     
     except httpx.RequestError:
         raise HTTPException(status_code=502, detail="Ошибка подключения к Telegram")
+
+
+@router.post("/upload")
+async def upload_image(file: UploadFile = File(...)):
+    """Upload an image locally."""
+    try:
+        # Create uploads dir
+        import shutil
+        import uuid
+        
+        upload_dir = "static/uploads"
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate unique filename
+        ext = os.path.splitext(file.filename)[1]
+        filename = f"{uuid.uuid4()}{ext}"
+        file_path = f"{upload_dir}/{filename}"
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        # Return path relative to root (for static serving)
+        return {"url": f"/static/uploads/{filename}", "file_id": f"/static/uploads/{filename}"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")

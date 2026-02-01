@@ -321,21 +321,20 @@ const Catalog = {
                     </div>
                     <div class="product-pack">${product.pieces_per_pack} шт/пач</div>
                     <div class="card-controls" onclick="event.stopPropagation();">
-                        ${qtyInCart > 0 ? `
-                            <div class="card-qty-controls">
-                                <button class="card-qty-btn" onclick="Catalog.updateCardQty(${product.id}, -1)">−</button>
-                                <span class="card-qty" id="grid-qty-${product.id}">${qtyInCart}</span>
-                                <button class="card-qty-btn" onclick="Catalog.updateCardQty(${product.id}, 1)">+</button>
-                            </div>
-                        ` : `
-                            <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${product.id})">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
-                                    <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
-                                    <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6"/>
-                                </svg>
-                            </button>
-                        `}
+                        <div class="card-controls-row">
+                            <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${product.id}, -1)" ${qtyInCart === 0 ? 'disabled style="opacity:0.5"' : ''}>−</button>
+                            ${qtyInCart > 0 ?
+                    `<span class="card-qty" id="grid-qty-${product.id}">${qtyInCart}</span>` :
+                    `<button class="card-add-icon-btn" onclick="Catalog.updateCardQty(${product.id}, 1)">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                                        <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                                        <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6"/>
+                                    </svg>
+                                </button>`
+                }
+                            <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${product.id}, 1)">+</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -410,25 +409,22 @@ const Catalog = {
         const controlsContainer = card.querySelector('.card-controls');
         const qtyInCart = this.getProductQtyInCart(productId);
 
-        if (qtyInCart > 0) {
-            controlsContainer.innerHTML = `
-                <div class="card-qty-controls">
-                    <button class="card-qty-btn" onclick="Catalog.updateCardQty(${productId}, -1)">−</button>
-                    <span class="card-qty" id="grid-qty-${productId}">${qtyInCart}</span>
-                    <button class="card-qty-btn" onclick="Catalog.updateCardQty(${productId}, 1)">+</button>
-                </div>
-            `;
-        } else {
-            controlsContainer.innerHTML = `
-                <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${productId})">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
-                        <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
-                        <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6"/>
-                    </svg>
-                </button>
-            `;
-        }
+        controlsContainer.innerHTML = `
+            <div class="card-controls-row">
+                <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${productId}, -1)" ${qtyInCart === 0 ? 'disabled style="opacity:0.5"' : ''}>−</button>
+                ${qtyInCart > 0 ?
+                `<span class="card-qty" id="grid-qty-${productId}">${qtyInCart}</span>` :
+                `<button class="card-add-icon-btn" onclick="Catalog.updateCardQty(${productId}, 1)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                            <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6"/>
+                        </svg>
+                    </button>`
+            }
+                <button class="card-qty-btn small" onclick="Catalog.updateCardQty(${productId}, 1)">+</button>
+            </div>
+        `;
     },
 
     /**

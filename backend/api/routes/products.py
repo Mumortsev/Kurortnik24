@@ -181,12 +181,43 @@ async def update_product(
         raise HTTPException(status_code=404, detail="Товар не найден")
     
     update_data = product.model_dump(exclude_unset=True)
+    
+    # Handle images update if provided
+    if "images" in update_data:
+        new_images = update_data.pop("images")
+        
+        # Delete existing images
+        await db.execute(select(ProductImage).where(ProductImage.product_id == product_id)) # Need to fetch to delete or delete directly
+        # Direct delete might require commit first or session query
+        # Easier: clear relationship
+        
+        # Actually, let's just delete all existing images for this product
+        from sqlalchemy import delete
+        await db.execute(delete(ProductImage).where(ProductImage.product_id == product_id))
+        
+        # Add new images
+        if new_images:
+            for idx, file_id in enumerate(new_images):
+                img = ProductImage(
+                    product_id=product_id,
+                    file_id=file_id,
+                    is_main=(idx == 0)
+                )
+                db.add(img)
+            
+            # Update legacy fields for compatibility
+            update_data["image_file_id"] = new_images[0]
+            # We don't have image_url here usually unless passed, but let's leave it.
+
     for key, value in update_data.items():
         setattr(db_product, key, value)
     
     await db.commit()
     await db.refresh(db_product)
-    return db_product
+    
+    # Reload with images
+    result = await db.execute(select(Product).options(selectinload(Product.images)).where(Product.id == product_id))
+    return result.scalar_one()
 
 
 @router.delete("/{product_id}", response_model=MessageResponse)

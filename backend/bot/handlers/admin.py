@@ -47,6 +47,7 @@ class AddProductStates(StatesGroup):
 
 class EditProductStates(StatesGroup):
     waiting_value = State()
+    waiting_photos = State()
 
 
 class AddCategoryStates(StatesGroup):
@@ -990,6 +991,65 @@ async def start_edit_field(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         f"✏️ Введите {field_names.get(field, 'новое значение')}:",
         reply_markup=get_cancel_keyboard()
+    )
+
+
+@router.callback_query(F.data.startswith("edit:photo"))
+async def start_edit_photo(callback: CallbackQuery, state: FSMContext):
+    """Start editing photos."""
+    product_id = int(callback.data.split(":")[2])
+    await state.update_data(product_id=product_id, images=[])
+    await state.set_state(EditProductStates.waiting_photos)
+    
+    await callback.message.edit_text(
+        "📷 <b>Изменение фото</b>\n\n"
+        "Отправьте <b>новые фотографии</b> товара (можно несколько).\n"
+        "⚠️ <b>Внимание:</b> Старые фото будут удалены!",
+        reply_markup=get_cancel_keyboard()
+    )
+
+
+@router.message(EditProductStates.waiting_photos, F.photo)
+async def process_edit_photo(message: Message, state: FSMContext):
+    """Process new photos during edit."""
+    photo = message.photo[-1]
+    data = await state.get_data()
+    images = data.get("images", [])
+    images.append(photo.file_id)
+    await state.update_data(images=images)
+    
+    count = len(images)
+    await message.answer(
+        f"✅ Фото #{count} добавлено.\n"
+        "Отправьте ещё или нажмите <b>Готово</b>.",
+        reply_markup=get_done_keyboard()
+    )
+
+
+@router.callback_query(EditProductStates.waiting_photos, F.data == "done")
+async def finish_edit_photo(callback: CallbackQuery, state: FSMContext):
+    """Finish photo editing."""
+    data = await state.get_data()
+    product_id = data.get("product_id")
+    images = data.get("images", [])
+    
+    if not images:
+        await callback.answer("❌ Загрузите хотя бы одно фото!", show_alert=True)
+        return
+        
+    result = await update_product(product_id, {"images": images})
+    await state.clear()
+    
+    if "error" in result:
+        await callback.message.answer(
+            f"❌ Ошибка: {result.get('detail')}",
+            reply_markup=get_admin_menu_keyboard()
+        )
+        return
+        
+    await callback.message.answer(
+        f"✅ <b>Фото обновлены!</b>\n\n{format_product_info(result)}",
+        reply_markup=get_admin_menu_keyboard()
     )
 
 
