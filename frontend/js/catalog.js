@@ -34,16 +34,30 @@ const Catalog = {
         const searchInput = document.getElementById('searchInput');
         const searchClear = document.getElementById('searchClear');
 
-        let searchTimeout;
+        const searchBtn = document.getElementById('searchBtn');
+
+        // Input handler - only shows/hides clear button
         searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
             const query = e.target.value.trim();
             searchClear.style.display = query ? 'flex' : 'none';
+        });
 
-            searchTimeout = setTimeout(() => {
-                this.searchQuery = query;
-                this.loadProducts(true);
-            }, 300);
+        // Search execution function
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            this.searchQuery = query;
+            this.loadProducts(true);
+        };
+
+        // Search button click
+        searchBtn.addEventListener('click', performSearch);
+
+        // Enter key in input
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+                searchInput.blur(); // Hide keyboard on mobile
+            }
         });
 
         searchClear.addEventListener('click', () => {
