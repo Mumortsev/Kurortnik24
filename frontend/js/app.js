@@ -126,6 +126,75 @@ const App = {
 
         // Product modal
         this.setupModal();
+
+        // Phone mask
+        this.setupPhoneMask();
+    },
+
+    /**
+     * Setup phone mask
+     */
+    setupPhoneMask() {
+        const input = document.getElementById('customerPhone');
+
+        const formatPhone = (value) => {
+            if (!value) return '';
+
+            // Strip non-digits
+            let digits = value.replace(/\D/g, '');
+
+            // Handle starting with 8 or other digit by forcing 7
+            if (digits.length > 0) {
+                if (digits[0] === '8') {
+                    digits = '7' + digits.substring(1);
+                } else if (digits[0] !== '7') {
+                    digits = '7' + digits;
+                }
+            }
+
+            // Limit to 11 digits (7 + 10 digits)
+            digits = digits.substring(0, 11);
+
+            let formatted = '';
+            if (digits.length > 0) formatted += '+7';
+            if (digits.length > 1) formatted += ' (' + digits.substring(1, 4);
+            if (digits.length > 4) formatted += ') ' + digits.substring(4, 7);
+            if (digits.length > 7) formatted += '-' + digits.substring(7, 9);
+            if (digits.length > 9) formatted += '-' + digits.substring(9, 11);
+
+            return formatted;
+        };
+
+        input.addEventListener('input', (e) => {
+            const oldValue = e.target.value;
+            const newValue = formatPhone(oldValue);
+
+            if (oldValue !== newValue) {
+                e.target.value = newValue;
+            }
+        });
+
+        // Prevent deleting prefix easily
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && input.value.length <= 4) {
+                e.preventDefault();
+                input.value = '';
+            }
+        });
+
+        // Focus handler
+        input.addEventListener('focus', () => {
+            if (!input.value) {
+                input.value = '+7 (';
+            }
+        });
+
+        // Blur handler
+        input.addEventListener('blur', () => {
+            if (input.value === '+7' || input.value === '+7 (') {
+                input.value = '';
+            }
+        });
     },
 
     /**
