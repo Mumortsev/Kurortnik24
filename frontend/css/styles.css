@@ -114,7 +114,7 @@ body {
 
 .main-content {
     /* Add header height + extra spacing */
-    padding-top: calc(var(--header-height) + var(--spacing-lg));
+    padding-top: calc(var(--header-height) + var(--spacing-xl));
     padding-bottom: calc(var(--bottom-nav-height) + var(--spacing-lg));
     min-height: 100vh;
 }
@@ -409,13 +409,7 @@ body {
 /* =====================================================
    Main Content
    ===================================================== */
-.main-content {
-    flex: 1;
-    margin-top: var(--header-height);
-    padding: var(--spacing-md);
-    padding-bottom: calc(var(--spacing-xl) + var(--bottom-nav-height));
-    overflow-y: auto;
-}
+
 
 .view {
     display: block;
