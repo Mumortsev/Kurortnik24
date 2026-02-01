@@ -50,8 +50,8 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
 
-    /* Header height - increased to accommodate sort menu */
-    --header-height: 220px;
+    /* Header height - Compact */
+    --header-height: 120px;
 
     /* Bottom nav height */
     --bottom-nav-height: 70px;
@@ -107,8 +107,6 @@ body {
     z-index: 100;
     background: var(--bg-secondary);
     padding: var(--spacing-md);
-    /* Header height - Reduced further since cart is gone */
-    --header-height: 120px;
     padding-top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px));
 }
 
@@ -203,8 +201,7 @@ body {
 
 
 
-/* Header height - recalculated for Logo + Welcome + Controls + Categories */
---header-height: 240px;
+
 
 /* ... */
 
