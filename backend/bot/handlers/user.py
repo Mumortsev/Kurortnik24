@@ -108,13 +108,24 @@ async def my_orders(message: Message):
         "completed": "📦"
     }
     
-    for order in orders[:10]:  # Show last 10 orders
+    for order in orders[:5]:  # Show last 5 orders fully
         status = order.get("status", "new")
         emoji = status_emoji.get(status, "📝")
         total = order.get("total_amount", 0)
         date = order.get("created_at", "")[:10]
         
-        text += f"{emoji} Заказ #{order['id']} — {total}₽ ({date})\n"
+        # Details
+        items_text = ""
+        for item in order.get("items", []):
+            items_text += f"{item['product_name']} x{item['quantity_packs']} ({item['subtotal']}₽)\n"
+        
+        text += (
+            f"➖➖➖➖➖➖➖➖➖➖\n"
+            f"{emoji} <b>Заказ #{order['id']}</b>\n"
+            f"📅 Дата: {date}\n"
+            f"📦 Товары:\n{items_text}"
+            f"💰 <b>Итого: {total}₽</b>\n"
+        )
     
     if len(orders) > 10:
         text += f"\n<i>...и ещё {len(orders) - 10} заказов</i>"

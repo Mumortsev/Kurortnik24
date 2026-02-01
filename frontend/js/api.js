@@ -91,8 +91,8 @@ const API = {
      * Get user orders
      */
     async getOrders(telegramId = null) {
-        const params = telegramId ? `?telegram_id=${telegramId}` : '';
-        return this.request(`/orders${params}`);
+        const params = telegramId ? `?telegram_user_id=${telegramId}` : '';
+        return this.request(`/orders/me${params}`);
     },
 
     /**
