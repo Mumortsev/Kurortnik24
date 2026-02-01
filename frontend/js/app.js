@@ -333,7 +333,10 @@ const App = {
         try {
             const orders = await API.getOrders(this.user.id);
 
-            if (!orders || orders.length === 0) {
+            // Handle wrapped response {orders: []} or array []
+            const ordersList = orders.orders ? orders.orders : orders;
+
+            if (!ordersList || !Array.isArray(ordersList) || ordersList.length === 0) {
                 document.getElementById('ordersEmpty').style.display = 'block';
                 document.getElementById('ordersList').innerHTML = '';
                 return;
@@ -341,7 +344,7 @@ const App = {
 
             document.getElementById('ordersEmpty').style.display = 'none';
 
-            const html = orders.map(order => `
+            const html = ordersList.map(order => `
                 <div class="order-card">
                     <div class="order-header">
                         <span class="order-id">Заказ #${order.id}</span>
@@ -349,7 +352,7 @@ const App = {
                     </div>
                     <div class="order-items">${order.items?.length || 0} товар(ов)</div>
                     <div class="order-footer">
-                        <span class="order-total">${order.total}₽</span>
+                        <span class="order-total">${order.total_amount || order.total}₽</span>
                         <span class="order-date">${this.formatDate(order.created_at)}</span>
                     </div>
                 </div>
