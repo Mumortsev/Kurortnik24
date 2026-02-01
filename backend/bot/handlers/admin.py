@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from ..keyboards import (
     get_admin_menu_keyboard, get_categories_keyboard,
     get_subcategories_keyboard, get_category_management_keyboard,
+    get_category_actions_keyboard,
     get_product_actions_keyboard, get_product_edit_keyboard,
     get_order_actions_keyboard, get_skip_keyboard, get_cancel_keyboard,
     get_confirm_keyboard, get_done_keyboard
@@ -19,7 +20,7 @@ from ..keyboards import (
 from ..utils import (
     is_admin, get_categories, get_products, get_product,
     create_product, update_product, delete_product,
-    create_category, create_subcategory, delete_category,
+    create_category, update_category, create_subcategory, delete_category,
     get_orders, update_order_status,
     format_product_info, format_order_info
 )
@@ -55,6 +56,10 @@ class AddCategoryStates(StatesGroup):
 class AddSubcategoryStates(StatesGroup):
     waiting_category = State()
     waiting_name = State()
+
+
+class EditCategoryStates(StatesGroup):
+    waiting_new_name = State()
 
 
 class FindProductStates(StatesGroup):
@@ -184,6 +189,35 @@ async def process_product_name(message: Message, state: FSMContext):
     """Process product name."""
     await state.update_data(name=message.text.strip())
     
+    data = await state.get_data()
+    
+    # Check if category is already selected (e.g. via "Add Product" from category menu)
+    if data.get("category_id"):
+        category_id = data["category_id"]
+        
+        # Get subcategories for this category
+        categories = await get_categories()
+        category = next((c for c in categories if c["id"] == category_id), None)
+        subcategories = category.get("subcategories", []) if category else []
+        
+        if not subcategories:
+            # No subcategories, skip to price
+            await state.update_data(subcategory_id=None)
+            await state.set_state(AddProductStates.waiting_price)
+            await message.answer(
+                "Шаг 5/8: Укажите <b>цену за 1 штуку</b> (₽)\n\n"
+                "Напишите число, например: 10",
+                reply_markup=get_cancel_keyboard()
+            )
+            return
+        
+        await state.set_state(AddProductStates.waiting_subcategory)
+        await message.answer(
+            "Шаг 4/8: Выберите <b>подкатегорию</b>",
+            reply_markup=get_subcategories_keyboard(subcategories, category_id, "add")
+        )
+        return
+
     categories = await get_categories()
     if not categories:
         await state.set_state(AddCategoryStates.waiting_name)
@@ -613,6 +647,165 @@ async def process_subcategory_name(message: Message, state: FSMContext):
     )
 
 
+# --- Category Actions (List, Rename, Delete, Products) ---
+
+@router.callback_query(F.data == "cat:list")
+async def list_categories_for_management(callback: CallbackQuery):
+    """List categories for detailed management."""
+    categories = await get_categories()
+    
+    if not categories:
+        await callback.message.edit_text(
+            "📁 Категорий пока нет.",
+            reply_markup=get_category_management_keyboard()
+        )
+        return
+        
+    await callback.message.edit_text(
+        "📁 <b>Выберите категорию для управления:</b>",
+        reply_markup=get_categories_keyboard(categories, "manage")
+    )
+
+
+@router.callback_query(F.data.startswith("cat:manage:"))
+async def manage_category_menu(callback: CallbackQuery):
+    """Show actions for a specific category."""
+    category_id = int(callback.data.split(":")[2])
+    
+    # Needs to fetch category name, but api only gives list.
+    # Optimization: fetch list and find (or add get_category endpoint later if needed).
+    categories = await get_categories()
+    category = next((c for c in categories if c["id"] == category_id), None)
+    
+    cat_name = category["name"] if category else "???"
+    
+    await callback.message.edit_text(
+        f"📁 <b>Категория: {cat_name}</b>\n"
+        f"🆔 ID: {category_id}\n\n"
+        "Выберите действие:",
+        reply_markup=get_category_actions_keyboard(category_id)
+    )
+
+
+@router.callback_query(F.data.startswith("cat:rename:"))
+async def start_category_rename(callback: CallbackQuery, state: FSMContext):
+    """Start category renaming."""
+    category_id = int(callback.data.split(":")[2])
+    await state.update_data(category_id=category_id)
+    await state.set_state(EditCategoryStates.waiting_new_name)
+    
+    await callback.message.edit_text(
+        "✏️ <b>Переименование категории</b>\n\n"
+        "Введите новое название:",
+        reply_markup=get_cancel_keyboard()
+    )
+
+
+@router.message(EditCategoryStates.waiting_new_name)
+async def process_category_rename(message: Message, state: FSMContext):
+    """Process new category name."""
+    new_name = message.text.strip()
+    data = await state.get_data()
+    category_id = data.get("category_id")
+    
+    result = await update_category(category_id, {"name": new_name})
+    await state.clear()
+    
+    if "error" in result:
+        await message.answer(
+            f"❌ Ошибка: {result.get('detail')}",
+            reply_markup=get_admin_menu_keyboard()
+        )
+        return
+
+    await message.answer(
+        f"✅ Категория переименована в «{new_name}»!",
+        reply_markup=get_category_actions_keyboard(category_id)
+    )
+
+
+@router.callback_query(F.data.startswith("cat:delete:"))
+async def confirm_delete_category(callback: CallbackQuery):
+    """Confirm category deletion."""
+    category_id = int(callback.data.split(":")[2])
+    
+    await callback.message.edit_text(
+        "⚠️ <b>Вы уверены?</b>\n\n"
+        "Удаление категории удалит и все её товары!",
+        reply_markup=get_confirm_keyboard("category", category_id)
+    )
+
+
+@router.callback_query(F.data.startswith("confirm:category:"))
+async def do_delete_category(callback: CallbackQuery):
+    """Delete the category."""
+    category_id = int(callback.data.split(":")[2])
+    result = await delete_category(category_id)
+    
+    if "error" in result:
+        await callback.answer(f"❌ Ошибка: {result.get('detail')}", show_alert=True)
+        return
+        
+    await callback.message.edit_text(
+        "🗑 Категория удалена.",
+        reply_markup=get_category_management_keyboard()
+    )
+
+
+@router.callback_query(F.data.startswith("cat:products:"))
+async def list_category_products(callback: CallbackQuery):
+    """List products in category for management."""
+    category_id = int(callback.data.split(":")[2])
+    result = await get_products(category=category_id, limit=50) # Increased limit for admin
+    
+    products = result.get("items", [])
+    
+    if not products:
+        await callback.message.edit_text(
+            "📦 В этой категории нет товаров.",
+            reply_markup=get_category_actions_keyboard(category_id)
+        )
+        return
+        
+    await callback.message.answer(
+        f"📦 <b>Товары в категории</b> ({len(products)} шт):",
+        reply_markup=None 
+    )
+    
+    # Show products with Edit buttons
+    for product in products:
+        text = format_product_info(product)
+        await callback.message.answer(
+            text,
+            reply_markup=get_product_actions_keyboard(product["id"])
+        )
+
+    # Show "Add Product" button at the end
+    builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text="➕ Добавить товар сюда", callback_data=f"product:add_to:{category_id}"))
+    builder.row(InlineKeyboardButton(text="◀️ Назад к категории", callback_data=f"cat:manage:{category_id}"))
+    
+    await callback.message.answer(
+        "👇 Действия:",
+        reply_markup=builder.as_markup()
+    )
+
+
+@router.callback_query(F.data.startswith("product:add_to:"))
+async def add_product_to_category(callback: CallbackQuery, state: FSMContext):
+    """Shortcut to add product directly to specific category."""
+    category_id = int(callback.data.split(":")[2])
+    
+    await state.set_state(AddProductStates.waiting_photo)
+    await state.update_data(category_id=category_id) # Pre-fill category
+    
+    await callback.message.edit_text(
+        "📷 <b>Добавление товара</b>\n\n"
+        "Шаг 1/8: Отправьте <b>фото товара</b>",
+        reply_markup=get_cancel_keyboard()
+    )
+
+
 # --- Orders ---
 
 @router.callback_query(F.data == "admin:new_orders")
@@ -728,6 +921,23 @@ async def edit_product_menu(callback: CallbackQuery):
         f"{format_product_info(product)}\n\n"
         "Что изменить?",
         reply_markup=get_product_edit_keyboard(product_id)
+    )
+
+
+@router.callback_query(F.data.startswith("product:view:"))
+async def view_product_details(callback: CallbackQuery):
+    """View product details (e.g. back from edit)."""
+    product_id = int(callback.data.split(":")[2])
+    product = await get_product(product_id)
+    
+    if "error" in product:
+        await callback.answer("❌ Товар не найден", show_alert=True)
+        return
+
+    text = format_product_info(product)
+    await callback.message.edit_text(
+        text,
+        reply_markup=get_product_actions_keyboard(product_id)
     )
 
 

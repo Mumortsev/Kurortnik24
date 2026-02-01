@@ -103,6 +103,9 @@ def get_category_management_keyboard() -> InlineKeyboardMarkup:
     """Category management menu."""
     builder = InlineKeyboardBuilder()
     builder.row(
+        InlineKeyboardButton(text="📋 Список категорий", callback_data="cat:list")
+    )
+    builder.row(
         InlineKeyboardButton(text="➕ Создать категорию", callback_data="cat:create")
     )
     builder.row(
@@ -116,6 +119,25 @@ def get_category_management_keyboard() -> InlineKeyboardMarkup:
     )
     builder.row(
         InlineKeyboardButton(text="◀️ Назад", callback_data="admin:menu")
+    )
+    return builder.as_markup()
+
+
+def get_category_actions_keyboard(category_id: int) -> InlineKeyboardMarkup:
+    """Actions for a single category."""
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="📦 Товары", callback_data=f"cat:products:{category_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="➕ Добавить товар", callback_data=f"product:add_to:{category_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="✏️ Переименовать", callback_data=f"cat:rename:{category_id}"),
+        InlineKeyboardButton(text="🗑 Удалить", callback_data=f"cat:delete:{category_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="◀️ Назад", callback_data="cat:list")
     )
     return builder.as_markup()
 

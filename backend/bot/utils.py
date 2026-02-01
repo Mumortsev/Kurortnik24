@@ -96,6 +96,11 @@ async def create_category(name: str) -> Dict:
     return await api_request("POST", "/api/categories", data={"name": name, "order": 0})
 
 
+async def update_category(category_id: int, data: Dict) -> Dict:
+    """Update a category."""
+    return await api_request("PUT", f"/api/categories/{category_id}", data=data)
+
+
 async def create_subcategory(category_id: int, name: str) -> Dict:
     """Create a new subcategory."""
     return await api_request(
