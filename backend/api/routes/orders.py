@@ -2,7 +2,7 @@
 Orders API routes with cart validation and order management.
 """
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -13,6 +13,7 @@ from ..schemas import (
     CartValidateRequest, CartValidateResponse, CartValidateError,
     OrderCreate, OrderResponse, OrderListResponse, MessageResponse
 )
+from ..notifier import notify_new_order
 
 router = APIRouter(prefix="/api", tags=["orders"])
 
@@ -76,6 +77,7 @@ async def validate_cart(
 @router.post("/orders", response_model=OrderResponse)
 async def create_order(
     order_data: OrderCreate,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -154,10 +156,11 @@ async def create_order(
         items=[]
     )
     
+    items_data = []
     for item in order.items:
         product_result = await db.execute(select(Product).where(Product.id == item.product_id))
         product = product_result.scalar_one()
-        order_response.items.append({
+        item_dict = {
             "id": item.id,
             "product_id": item.product_id,
             "product_name": product.name,
@@ -165,7 +168,19 @@ async def create_order(
             "quantity_pieces": item.quantity_pieces,
             "price_per_unit": float(item.price_per_unit),
             "subtotal": float(item.subtotal)
-        })
+        }
+        order_response.items.append(item_dict)
+        items_data.append(item_dict)
+        
+    # Send notification in background
+    order_info = {
+        "id": order.id,
+        "customer_name": order.customer_name,
+        "customer_organization": order.customer_organization,
+        "customer_phone": order.customer_phone,
+        "total_amount": float(order.total_amount)
+    }
+    background_tasks.add_task(notify_new_order, order_info, items_data)
     
     return order_response
 
