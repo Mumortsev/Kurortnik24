@@ -285,8 +285,8 @@ body {
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    margin-top: -1px;
-    /* Visual correction */
+    margin-top: -3px;
+    /* Raise it more */
     color: var(--text-muted);
     pointer-events: none;
 }
