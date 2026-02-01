@@ -107,32 +107,54 @@ body {
     z-index: 100;
     background: var(--bg-secondary);
     padding: var(--spacing-md);
-    /* Header height - Reduced for cleaner look */
-    --header-height: 140px;
+    /* Header height - Reduced further since cart is gone */
+    --header-height: 120px;
     padding-top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px));
 }
 
 .header-top {
     display: flex;
     flex-direction: row;
-    /* Horizontal layout */
     align-items: center;
+    /* Center vertically */
     justify-content: space-between;
-    /* Space between logo and right controls */
     margin-bottom: var(--spacing-sm);
-    position: relative;
     padding-right: 0;
+    height: 40px;
+    /* Fixed height for alignment */
+}
+
+.logo-container {
+    width: auto;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 32px;
+    /* Slightly smaller logo */
+    width: auto;
+    object-fit: contain;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 /* Welcome message */
 .welcome-message {
     font-size: 14px;
-    /* Smaller font */
     font-weight: 500;
     color: var(--text-primary);
-    letter-spacing: -0.5px;
     text-align: right;
     margin-bottom: 0;
+    line-height: 1;
+    /* Reset line height for better alignment */
+    padding-top: 4px;
+    /* Visual tweak to match logo text baseline */
 }
 
 .header-actions {
@@ -181,13 +203,6 @@ body {
 
 
 
-.logo {
-    height: 50px;
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
-}
-
 /* Header height - recalculated for Logo + Welcome + Controls + Categories */
 --header-height: 240px;
 
@@ -195,8 +210,11 @@ body {
 
 .header-controls {
     display: flex;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
+    gap: 16px;
+    /* Increased gap to separate inputs */
+    margin-bottom: var(--spacing-md);
+    margin-top: -10px;
+    /* Pull closer to header */
 }
 
 .search-container {
