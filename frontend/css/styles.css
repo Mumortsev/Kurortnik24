@@ -161,6 +161,7 @@ body {
 .header-actions {
     display: flex;
     gap: var(--spacing-sm);
+    margin-left: var(--spacing-sm);
 }
 
 .header-btn {
@@ -175,8 +176,6 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all var(--transition-fast);
-    position: static;
-    /* No longer absolute */
 }
 
 .header-btn:active {
