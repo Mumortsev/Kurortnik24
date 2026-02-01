@@ -34,7 +34,7 @@ const Catalog = {
         const searchInput = document.getElementById('searchInput');
         const searchClear = document.getElementById('searchClear');
 
-        const searchBtn = document.getElementById('searchBtn');
+
 
         // Input handler - only shows/hides clear button
         searchInput.addEventListener('input', (e) => {
@@ -49,8 +49,7 @@ const Catalog = {
             this.loadProducts(true);
         };
 
-        // Search button click
-        searchBtn.addEventListener('click', performSearch);
+
 
         // Enter key in input
         searchInput.addEventListener('keyup', (e) => {
