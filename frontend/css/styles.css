@@ -1594,3 +1594,15 @@ body {
     opacity: 0.8;
 }
 
+
+/* Fix for unclickable nav items */
+.nav-item {
+    pointer-events: auto !important;
+    user-select: none;
+    z-index: 10;
+}
+
+.nav-item * {
+    pointer-events: none !important;
+}
+
