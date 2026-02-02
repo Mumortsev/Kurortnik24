@@ -376,11 +376,13 @@ const Admin = {
 
             // Load images
             if (p.images && p.images.length > 0) {
-                this.currentProductImages = p.images.map(img => img.file_id || img.image_url);
+                this.currentProductImages = p.images.map(img => img.file_id || img.image_url).filter(Boolean);
             } else if (p.image_file_id) {
                 this.currentProductImages = [p.image_file_id];
             } else if (p.image_url) {
                 this.currentProductImages = [p.image_url];
+            } else {
+                this.currentProductImages = [];
             }
             this.renderProductImages();
         }
