@@ -81,27 +81,29 @@ const Catalog = {
             this.loadProducts(true);
         });
 
-        // Infinite scroll
-        const mainContent = document.getElementById('mainContent');
-        mainContent.addEventListener('scroll', () => {
+        // Infinite scroll - Using window scroll because mainContent might not trigger it directly if body scrolls
+        window.addEventListener('scroll', () => {
             if (this.isLoading || !this.hasMore) return;
 
-            const scrollTop = mainContent.scrollTop;
-            const scrollHeight = mainContent.scrollHeight;
-            const clientHeight = mainContent.clientHeight;
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = window.innerHeight;
 
-            if (scrollTop + clientHeight >= scrollHeight - 200) {
+            // Load more when user is near bottom (300px buffer)
+            if (scrollTop + clientHeight >= scrollHeight - 300) {
                 this.loadMoreProducts();
             }
 
-            // Scroll to top button
+            // Scroll to top button visibility
             const scrollTopBtn = document.getElementById('scrollTop');
-            scrollTopBtn.style.display = scrollTop > 300 ? 'block' : 'none';
-        });
+            if (scrollTopBtn) {
+                scrollTopBtn.style.display = scrollTop > 300 ? 'block' : 'none';
+            }
+        }, { passive: true });
 
         // Scroll to top
         document.getElementById('scrollTop').addEventListener('click', () => {
-            mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     },
 
