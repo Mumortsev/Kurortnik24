@@ -23,13 +23,13 @@ async def get_categories(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Category)
         .options(selectinload(Category.subcategories))
-        .order_by(Category.order, Category.id)
+        .order_by(Category.name)
     )
     categories = result.scalars().all()
     
     # Sort subcategories by order
     for category in categories:
-        category.subcategories = sorted(category.subcategories, key=lambda x: (x.order, x.id))
+        category.subcategories = sorted(category.subcategories, key=lambda x: x.name)
     
     return CategoryTreeResponse(categories=categories)
 
