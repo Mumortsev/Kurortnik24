@@ -114,7 +114,9 @@ const API = {
         // If it's a static backend file (uploaded)
         if (fileIdOrUrl.startsWith('/static/')) {
             const origin = new URL(this.baseUrl).origin;
-            return `${origin}${fileIdOrUrl}`;
+            const fullUrl = `${origin}${fileIdOrUrl}`;
+            console.log('[API] Resolved static URL:', fullUrl);
+            return fullUrl;
         }
 
         if (fileIdOrUrl.startsWith('/')) {
