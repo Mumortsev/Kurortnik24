@@ -113,16 +113,20 @@
 
             <!-- Upload Tab -->
             <div id="uploadTab" class="tab-content">
-                <div class="instruction-step">
-                    <span class="step-number">1</span>
-                    <p>Подготовьте файл Excel (таблицу) с товарами.</p>
+                <div class="instruction-step" style="margin-bottom: 40px; text-align: center;">
+                    <p style="font-size: 16px; color: var(--text-secondary);">Подготовьте файл Excel (таблицу) с
+                        товарами.</p>
                 </div>
-                <div class="upload-zone" id="dropZone">
-                    <div class="upload-icon">📥</div>
-                    <h3>Загрузить файл Excel</h3>
+
+                <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-btn-excel">
+                        <div class="upload-icon-large">📥</div>
+                        <div class="upload-text-main">Загрузить файл Excel</div>
+                        <div class="upload-text-sub">Нажмите для выбора файла</div>
+                    </div>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
                 </div>
-                <div class="upload-status" id="uploadStatus"></div>
+                <div class="upload-status" id="uploadStatus" style="margin-top: 20px;"></div>
             </div>
         </main>
     </div>
