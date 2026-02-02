@@ -101,8 +101,12 @@ from pathlib import Path
 current_file = Path(__file__).resolve()
 backend_root = current_file.parent.parent
 static_dir = backend_root / "static"
+uploads_dir = static_dir / "uploads"
 
+# Ensure both directories exist on startup
 os.makedirs(static_dir, exist_ok=True)
+os.makedirs(uploads_dir, exist_ok=True)
+print(f"Verified static directories: {static_dir}, {uploads_dir}")
 
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static_assets") 
 app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
