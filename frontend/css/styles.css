@@ -1667,7 +1667,9 @@ body {
     background: var(--accent-danger);
 }
 
-opacity: 0.9;
+
+.btn-icon-styled.danger:hover {
+    opacity: 0.9;
 }
 
 /* Excel Upload Button */
