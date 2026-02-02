@@ -107,7 +107,17 @@ const API = {
         }
 
         // If it's a file path
-        if (fileIdOrUrl.startsWith('/') || fileIdOrUrl.startsWith('assets/')) {
+        if (fileIdOrUrl.startsWith('assets/')) {
+            return fileIdOrUrl;
+        }
+
+        // If it's a static backend file (uploaded)
+        if (fileIdOrUrl.startsWith('/static/')) {
+            const origin = new URL(this.baseUrl).origin;
+            return `${origin}${fileIdOrUrl}`;
+        }
+
+        if (fileIdOrUrl.startsWith('/')) {
             return fileIdOrUrl;
         }
 
