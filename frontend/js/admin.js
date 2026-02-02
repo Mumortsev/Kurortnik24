@@ -23,11 +23,14 @@ const Admin = {
         }
 
         this.setupTabs();
+        this.switchTab('categories'); // Ensure we start clean
         this.setupUpload();
 
         if (this.isAdmin || !window.Telegram.WebApp.initData) {
             this.loadCategories();
-            this.loadProducts(); // Preload for search
+
+            // Don't load products immediately to speed up init and avoid clutter
+            // this.loadProducts();
         }
     },
 
@@ -70,10 +73,14 @@ const Admin = {
 
                 btn.classList.add('active');
                 const tabId = btn.dataset.tab + 'Tab';
+                // Show target
                 document.getElementById(tabId).style.display = 'block';
 
-                if (btn.dataset.tab === 'categories') this.loadCategories();
-                if (btn.dataset.tab === 'products') this.loadProducts();
+                if (btn.dataset.tab === 'categories') {
+                    this.loadCategories();
+                } else if (btn.dataset.tab === 'products') {
+                    this.loadProducts();
+                }
             });
         });
     },
@@ -136,12 +143,12 @@ const Admin = {
                     </div>
                 </div>
             `).join('') + `
-            <div class="category-card" style="border-style:dashed; opacity:0.7;" onclick="Admin.openSubcategoryModal(${catId})">
+            <div class="category-card" style="border-style:dashed; border-color: #217346; color: #217346; opacity:0.9;" onclick="Admin.openSubcategoryModal(${catId})">
                 <div class="category-name" style="margin:auto;">+ Подкатегория</div>
             </div>`;
         } else {
             document.getElementById('categoriesList').innerHTML = `
-             <div class="category-card" style="border-style:dashed; opacity:0.75; min-height:80px;" onclick="Admin.openSubcategoryModal(${catId})">
+             <div class="category-card" style="border-style:dashed; border-color: #217346; color: #217346; opacity:0.9; min-height:80px;" onclick="Admin.openSubcategoryModal(${catId})">
                 <div class="category-name" style="margin:auto;">+ Добавить подкатегорию</div>
             </div>`;
         }
