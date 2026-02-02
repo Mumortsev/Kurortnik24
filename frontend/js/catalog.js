@@ -105,6 +105,14 @@ const Catalog = {
         document.getElementById('scrollTop').addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // Load More Button (Manual Fallback)
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                this.loadMoreProducts();
+            });
+        }
     },
 
     /**
@@ -281,6 +289,12 @@ const Catalog = {
         } finally {
             this.isLoading = false;
             document.getElementById('productsLoading').style.display = 'none';
+
+            // Update Load More Button visibility
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) {
+                loadMoreBtn.style.display = this.hasMore ? 'block' : 'none';
+            }
         }
     },
 
