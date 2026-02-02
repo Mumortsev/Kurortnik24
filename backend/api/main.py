@@ -70,11 +70,16 @@ async def health():
     return {"status": "healthy"}
 
 # Serve Static Files (Frontend)
-# Create static directory if it doesn't exist to avoid errors locally
-os.makedirs("static", exist_ok=True)
+# Use absolute path to ensure consistency
+from pathlib import Path
+current_file = Path(__file__).resolve()
+backend_root = current_file.parent.parent
+static_dir = backend_root / "static"
 
-app.mount("/static", StaticFiles(directory="static"), name="static_assets") # Mount specific static assets if needed
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+os.makedirs(static_dir, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static_assets") 
+app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 
 
 

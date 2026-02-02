@@ -67,17 +67,23 @@ async def get_image(file_id: str):
 async def upload_image(file: UploadFile = File(...)):
     """Upload an image locally."""
     try:
-        # Create uploads dir
+        # Create uploads dir (Absolute path relative to backend root)
+        # __file__ = backend/api/routes/images.py
+        # parent.parent.parent = backend/
+        from pathlib import Path
         import shutil
         import uuid
         
-        upload_dir = "static/uploads"
+        current_file = Path(__file__).resolve()
+        backend_root = current_file.parent.parent.parent
+        upload_dir = backend_root / "static" / "uploads"
+        
         os.makedirs(upload_dir, exist_ok=True)
         
         # Generate unique filename
         ext = os.path.splitext(file.filename)[1]
         filename = f"{uuid.uuid4()}{ext}"
-        file_path = f"{upload_dir}/{filename}"
+        file_path = upload_dir / filename
         
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
