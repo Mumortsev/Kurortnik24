@@ -36,11 +36,18 @@ const Catalog = {
 
 
 
-        // Input handler - only shows/hides clear button
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            searchClear.style.display = query ? 'flex' : 'none';
-        });
+        // Debounce utility
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
 
         // Search execution function
         const performSearch = () => {
@@ -49,14 +56,14 @@ const Catalog = {
             this.loadProducts(true);
         };
 
+        // Debounced search
+        const debouncedSearch = debounce(() => performSearch(), 400);
 
-
-        // Enter key in input
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-                searchInput.blur(); // Hide keyboard on mobile
-            }
+        // Input handler - Real-time search
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            searchClear.style.display = query ? 'flex' : 'none';
+            debouncedSearch();
         });
 
         searchClear.addEventListener('click', () => {
@@ -64,6 +71,7 @@ const Catalog = {
             searchClear.style.display = 'none';
             this.searchQuery = '';
             this.loadProducts(true);
+            searchInput.focus();
         });
 
         // Sort
