@@ -1606,3 +1606,9 @@ body {
     pointer-events: none !important;
 }
 
+
+/* Force high z-index for bottom nav */
+.bottom-nav {
+    z-index: 9999 !important;
+}
+

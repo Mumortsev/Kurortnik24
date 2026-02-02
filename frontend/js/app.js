@@ -201,28 +201,33 @@ const App = {
      * Setup bottom navigation
      */
     setupBottomNav() {
-        const navItems = document.querySelectorAll('.nav-item[data-view]');
+        // Use event delegation on the container
+        const navContainer = document.querySelector('.nav-pill');
 
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const viewId = item.dataset.view;
+        if (!navContainer) return;
 
-                // Update active state
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
+        navContainer.addEventListener('click', (e) => {
+            // Find the closest nav-item ancestor (or the element itself)
+            const item = e.target.closest('.nav-item');
 
-                // Show view
-                if (viewId === 'cartView') {
-                    this.showCart();
-                } else if (viewId === 'profileView') {
-                    this.showView('profileView');
-                } else {
-                    this.showCatalog();
-                }
-            });
+            // If no nav-item was clicked, or it doesn't have a view (e.g. just a container), ignore
+            if (!item || !item.dataset.view) return;
+
+            const viewId = item.dataset.view;
+
+            // Update active state
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+
+            // Show view
+            if (viewId === 'cartView') {
+                this.showCart();
+            } else if (viewId === 'profileView') {
+                this.showView('profileView');
+            } else {
+                this.showCatalog();
+            }
         });
-
-
     },
 
     /**
