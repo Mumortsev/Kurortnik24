@@ -81,6 +81,7 @@ class ProductUpdate(BaseModel):
     subcategory_id: Optional[int] = None
     image_url: Optional[str] = None
     image_file_id: Optional[str] = None
+    images: Optional[List[str]] = None  # List of file_ids
     in_stock: Optional[int] = None
     active: Optional[bool] = None
 
