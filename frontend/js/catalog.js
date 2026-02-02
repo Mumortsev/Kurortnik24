@@ -94,17 +94,7 @@ const Catalog = {
                 this.loadMoreProducts();
             }
 
-            // Scroll to top button visibility
-            const scrollTopBtn = document.getElementById('scrollTop');
-            if (scrollTopBtn) {
-                scrollTopBtn.style.display = scrollTop > 300 ? 'block' : 'none';
-            }
         }, { passive: true });
-
-        // Scroll to top
-        document.getElementById('scrollTop').addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
 
         // Load More Button (Manual Fallback)
         const loadMoreBtn = document.getElementById('loadMoreBtn');

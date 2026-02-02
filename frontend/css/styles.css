@@ -1449,29 +1449,7 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
-/* =====================================================
-   Scroll to top
-   ===================================================== */
-.scroll-top {
-    position: fixed;
-    bottom: calc(var(--bottom-nav-height) + 20px);
-    right: var(--spacing-md);
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: var(--shadow-lg);
-    z-index: 99;
-    transition: all var(--transition-fast);
-}
 
-.scroll-top:active {
-    transform: scale(0.95);
-}
 
 /* =====================================================
    Loading
