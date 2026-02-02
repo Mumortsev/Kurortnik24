@@ -39,7 +39,15 @@ const Admin = {
             alert('Ошибка: API не иницилизировано');
             return;
         }
-        window.location.href = `${API.baseUrl}/admin/template`;
+        const url = `${API.baseUrl}/admin/template`;
+
+        // Try Telegram WebApp method first (best for mobile)
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
+            window.Telegram.WebApp.openLink(url, { try_instant_view: false });
+        } else {
+            // Fallback for desktop/browser
+            window.open(url, '_blank');
+        }
     },
 
     async checkAuth() {
