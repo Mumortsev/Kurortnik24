@@ -269,8 +269,8 @@ const Admin = {
                 <td>${p.sku || '-'}</td>
                 <td>
                     <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-sm btn-outline-primary" style="padding: 4px 12px; font-size: 13px;" onclick="Admin.openProductModal(${p.id})">Редактировать</button>
-                        <button class="btn btn-sm btn-outline-danger" style="padding: 4px 12px; font-size: 13px; color: #dc3545; border-color: #dc3545;" onclick="Admin.deleteProduct(${p.id})">Удалить</button>
+                        <button class="btn-icon-styled primary" onclick="Admin.openProductModal(${p.id})">✏️</button>
+                        <button class="btn-icon-styled danger" onclick="Admin.deleteProduct(${p.id})">🗑</button>
                     </div>
                 </td>
             </tr>

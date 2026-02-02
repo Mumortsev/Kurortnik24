@@ -36,9 +36,14 @@
 
             <!-- Categories Tab -->
             <div id="categoriesTab" class="tab-content active">
-                <div class="section-header">
+                <div class="section-header"
+                    style="justify-content: space-between; align-items: flex-start; padding-right: 10px;">
                     <h3>Структура каталога</h3>
-                    <button class="btn btn-primary" onclick="Admin.openCategoryModal()">+ Категория</button>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 10px;">
+                        <button class="btn btn-primary"
+                            style="padding: 8px 16px; font-size: 14px; border-radius: 12px; box-shadow: 0 4px 12px rgba(27, 58, 95, 0.2);"
+                            onclick="Admin.openCategoryModal()">+ Категория</button>
+                    </div>
                 </div>
                 <!-- Breadcrumbs -->
                 <div id="breadcrumbs" class="breadcrumbs" style="display:none;">
@@ -75,11 +80,13 @@
 
             <!-- Products Tab (All) -->
             <div id="productsTab" class="tab-content">
-                <div class="section-header" style="justify-content: space-between; align-items: flex-start;">
+                <div class="section-header"
+                    style="justify-content: space-between; align-items: flex-start; padding-right: 10px;">
                     <h3>Все товары</h3>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-                        <!-- Moved button here to be under the right side (Import tab area roughly) -->
-                        <button class="btn btn-primary" style="padding: 6px 16px; font-size: 14px; border-radius: 20px;"
+                    <!-- Aligned to be roughly under the 'Import' tab which is the 3rd tab -->
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 10px;">
+                        <button class="btn btn-primary"
+                            style="padding: 8px 16px; font-size: 14px; border-radius: 12px; box-shadow: 0 4px 12px rgba(27, 58, 95, 0.2);"
                             onclick="Admin.openProductModal()">+ Товар</button>
                     </div>
                 </div>
