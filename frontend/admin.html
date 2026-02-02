@@ -127,6 +127,16 @@
                     </div>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
                 </div>
+
+                <!-- Download Template Link -->
+                <div style="margin-top: 15px; text-align: center;">
+                    <a href="#"
+                        onclick="event.preventDefault(); window.location.href = API.baseUrl + '/admin/template';"
+                        style="color: var(--primary-color); text-decoration: underline; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+                        <span>📥</span> Скачать образец таблицы
+                    </a>
+                </div>
+
                 <div class="upload-status" id="uploadStatus" style="margin-top: 20px;"></div>
             </div>
         </main>
