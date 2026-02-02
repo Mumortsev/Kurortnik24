@@ -1667,6 +1667,65 @@ body {
     background: var(--accent-danger);
 }
 
-.btn-icon-styled.danger:hover {
-    opacity: 0.9;
+opacity: 0.9;
+}
+
+/* Excel Upload Button */
+#uploadTab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    /* Fill reasonable height to center vertically */
+}
+
+.upload-zone {
+    width: 100%;
+    max-width: 400px;
+    /* Limit width */
+    margin: 20px auto;
+}
+
+.upload-btn-excel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #217346;
+    /* Official Excel Green */
+    color: white;
+    padding: 30px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(33, 115, 70, 0.3);
+}
+
+.upload-btn-excel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(33, 115, 70, 0.4);
+    background-color: #1e6b41;
+}
+
+.upload-btn-excel:active {
+    transform: translateY(0);
+}
+
+.upload-icon-large {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.upload-text-main {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.upload-text-sub {
+    font-size: 13px;
+    opacity: 0.8;
 }
