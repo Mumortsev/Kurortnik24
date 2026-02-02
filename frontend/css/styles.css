@@ -1636,37 +1636,38 @@ body {
 
 #loadMoreBtn:active {
     transform: scale(0.98);
+}
 
-    /* Admin Icon Buttons */
-    .btn-icon-styled {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-        background: transparent;
-        transition: all 0.2s;
-    }
+/* Admin Icon Buttons */
+.btn-icon-styled {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.2s;
+}
 
-    .btn-icon-styled.primary {
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-    }
+.btn-icon-styled.primary {
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
 
-    .btn-icon-styled.primary:hover {
-        background: var(--primary-color);
-        color: white;
-    }
+.btn-icon-styled.primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
 
-    .btn-icon-styled.danger {
-        border: 1px solid var(--accent-danger);
-        color: var(--accent-danger);
-    }
+.btn-icon-styled.danger {
+    border: 1px solid var(--accent-danger);
+    color: var(--accent-danger);
+}
 
-    .btn-icon-styled.danger:hover {
-        background: var(--accent-danger);
-        color: white;
-    }
+.btn-icon-styled.danger:hover {
+    background: var(--accent-danger);
+    color: white;
+}
