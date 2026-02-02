@@ -357,19 +357,17 @@ const Catalog = {
                 setTimeout(() => this.loadMoreProducts(), 100);
             }
         }
-    },
+        // Click handlers for card (open modal)
+        grid.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Don't open modal if clicking on controls
+                if (e.target.closest('.card-controls')) return;
 
-    // Click handlers for card (open modal)
-    grid.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            // Don't open modal if clicking on controls
-            if (e.target.closest('.card-controls')) return;
-
-            const productId = parseInt(card.dataset.id);
-            App.openModal(productId);
+                const productId = parseInt(card.dataset.id);
+                App.openModal(productId);
+            });
         });
-    });
-},
+    },
 
     /**
      * Add to cart from card (using local selection)
@@ -390,55 +388,55 @@ const Catalog = {
         this.refreshCardControls(productId);
     },
 
-        /**
-         * Adjust local quantity on card
-         */
-        adjustLocalQty(productId, delta) {
-    if (!this.localQuantities[productId]) {
-        this.localQuantities[productId] = 1;
-    }
+    /**
+     * Adjust local quantity on card
+     */
+    adjustLocalQty(productId, delta) {
+        if (!this.localQuantities[productId]) {
+            this.localQuantities[productId] = 1;
+        }
 
-    const current = this.localQuantities[productId];
-    const product = this.products.find(p => p.id === productId);
-    const min = product?.min_order_packs || 1;
+        const current = this.localQuantities[productId];
+        const product = this.products.find(p => p.id === productId);
+        const min = product?.min_order_packs || 1;
 
-    let newQty = current + delta;
-    if (newQty < min) newQty = min;
+        let newQty = current + delta;
+        if (newQty < min) newQty = min;
 
-    this.localQuantities[productId] = newQty;
-    this.refreshCardControls(productId);
-},
+        this.localQuantities[productId] = newQty;
+        this.refreshCardControls(productId);
+    },
 
-/**
- * Refresh card controls
- */
-refreshCardControls(productId) {
-    const qtyDisplay = document.getElementById(`grid-qty-${productId}`);
-    if (qtyDisplay) {
-        qtyDisplay.textContent = this.localQuantities[productId] || 1;
-    }
-},
+    /**
+     * Refresh card controls
+     */
+    refreshCardControls(productId) {
+        const qtyDisplay = document.getElementById(`grid-qty-${productId}`);
+        if (qtyDisplay) {
+            qtyDisplay.textContent = this.localQuantities[productId] || 1;
+        }
+    },
 
-/**
- * Show product in modal
- */
-showProductInModal(productId) {
-    const product = this.products.find(p => p.id === productId);
-    if (!product) return;
+    /**
+     * Show product in modal
+     */
+    showProductInModal(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
 
-    // Prepare images
-    let imagesHtml = '';
-    const hasMultipleImages = product.images && product.images.length > 1;
+        // Prepare images
+        let imagesHtml = '';
+        const hasMultipleImages = product.images && product.images.length > 1;
 
-    let imageSources = [];
-    if (product.images && product.images.length > 0) {
-        imageSources = product.images.map(img => API.getImageUrl(img.file_id || img.image_url, 'large'));
-    } else {
-        imageSources = [API.getImageUrl(product.image_file_id || product.image_url || product.image, 'large')];
-    }
+        let imageSources = [];
+        if (product.images && product.images.length > 0) {
+            imageSources = product.images.map(img => API.getImageUrl(img.file_id || img.image_url, 'large'));
+        } else {
+            imageSources = [API.getImageUrl(product.image_file_id || product.image_url || product.image, 'large')];
+        }
 
-    if (hasMultipleImages) {
-        imagesHtml = `
+        if (hasMultipleImages) {
+            imagesHtml = `
                 <div class="product-images-container">
                     <div class="product-images-slider">
                         ${imageSources.map(src => `
@@ -450,16 +448,16 @@ showProductInModal(productId) {
                     </div>
                 </div>
             `;
-    } else {
-        imagesHtml = `
+        } else {
+            imagesHtml = `
                 <div class="product-images-container">
                     <img class="product-detail-image" src="${imageSources[0]}" alt="${product.name}" onerror="this.src='assets/placeholder.svg'">
                 </div>
              `;
-    }
+        }
 
-    const detail = document.getElementById('modalProductDetail');
-    detail.innerHTML = `
+        const detail = document.getElementById('modalProductDetail');
+        detail.innerHTML = `
             ${imagesHtml}
             <div class="product-detail-content">
                 <h1 class="product-detail-name">${product.name}</h1>
@@ -484,57 +482,57 @@ showProductInModal(productId) {
             </div>
         `;
 
-    // Slider logic
-    if (hasMultipleImages) {
-        const slider = detail.querySelector('.product-images-slider');
-        slider.addEventListener('scroll', () => {
-            const index = Math.round(slider.scrollLeft / slider.offsetWidth);
-            detail.querySelectorAll('.slider-dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
+        // Slider logic
+        if (hasMultipleImages) {
+            const slider = detail.querySelector('.product-images-slider');
+            slider.addEventListener('scroll', () => {
+                const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+                detail.querySelectorAll('.slider-dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
             });
-        });
-    }
-
-    // Quantity controls
-    let quantity = 1;
-    const updateQuantity = () => {
-        document.getElementById('qtyPacks').textContent = quantity;
-        document.getElementById('qtyPieces').textContent = quantity * product.pieces_per_pack;
-        document.getElementById('qtyTotal').textContent = this.formatPrice(product.price_per_unit * product.pieces_per_pack * quantity);
-        detail.querySelector('[data-action="decrease"]').disabled = quantity <= (product.min_order_packs || 1);
-    };
-
-    detail.querySelector('[data-action="decrease"]').addEventListener('click', () => {
-        if (quantity > (product.min_order_packs || 1)) {
-            quantity--;
-            updateQuantity();
         }
-    });
 
-    detail.querySelector('[data-action="increase"]').addEventListener('click', () => {
-        quantity++;
-        updateQuantity();
-    });
+        // Quantity controls
+        let quantity = 1;
+        const updateQuantity = () => {
+            document.getElementById('qtyPacks').textContent = quantity;
+            document.getElementById('qtyPieces').textContent = quantity * product.pieces_per_pack;
+            document.getElementById('qtyTotal').textContent = this.formatPrice(product.price_per_unit * product.pieces_per_pack * quantity);
+            detail.querySelector('[data-action="decrease"]').disabled = quantity <= (product.min_order_packs || 1);
+        };
 
-    // Add to cart
-    document.getElementById('addToCartBtn').addEventListener('click', () => {
-        Cart.addProduct(product, quantity);
-        App.updateCartBadge();
-        App.closeModal();
-        this.refreshCardControls(product.id);
-    });
-},
+        detail.querySelector('[data-action="decrease"]').addEventListener('click', () => {
+            if (quantity > (product.min_order_packs || 1)) {
+                quantity--;
+                updateQuantity();
+            }
+        });
 
-/**
- * Show skeleton loading
- */
-showSkeletonLoading() {
-    const grid = document.getElementById('productsGrid');
-    const skeletonCount = this.itemsPerPage;
+        detail.querySelector('[data-action="increase"]').addEventListener('click', () => {
+            quantity++;
+            updateQuantity();
+        });
 
-    let html = '';
-    for (let i = 0; i < skeletonCount; i++) {
-        html += `
+        // Add to cart
+        document.getElementById('addToCartBtn').addEventListener('click', () => {
+            Cart.addProduct(product, quantity);
+            App.updateCartBadge();
+            App.closeModal();
+            this.refreshCardControls(product.id);
+        });
+    },
+
+    /**
+     * Show skeleton loading
+     */
+    showSkeletonLoading() {
+        const grid = document.getElementById('productsGrid');
+        const skeletonCount = this.itemsPerPage;
+
+        let html = '';
+        for (let i = 0; i < skeletonCount; i++) {
+            html += `
                 <div class="product-card skeleton-card">
                     <div class="product-image skeleton"></div>
                     <div class="product-info">
@@ -544,25 +542,25 @@ showSkeletonLoading() {
                     </div>
                 </div>
             `;
+        }
+        grid.innerHTML = html;
+    },
+
+    /**
+     * Get product packs in cart
+     */
+    getProductQtyInCart(productId) {
+        const item = Cart.items.find(item => item.product.id === productId);
+        return item ? item.packs : 0;
+    },
+
+    /**
+     * Format price
+     */
+    formatPrice(price) {
+        if (!price) return '0';
+        return Math.round(price * 100) / 100;
     }
-    grid.innerHTML = html;
-},
-
-/**
- * Get product packs in cart
- */
-getProductQtyInCart(productId) {
-    const item = Cart.items.find(item => item.product.id === productId);
-    return item ? item.packs : 0;
-},
-
-/**
- * Format price
- */
-formatPrice(price) {
-    if (!price) return '0';
-    return Math.round(price * 100) / 100;
-}
 };
 
 // Make it global
