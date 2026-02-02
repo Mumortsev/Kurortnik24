@@ -1682,6 +1682,17 @@ body {
     /* Fill reasonable height to center vertically */
 }
 
+.btn-green {
+    background-color: #217346 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-green:hover {
+    background-color: #1e6b41 !important;
+    box-shadow: 0 4px 12px rgba(33, 115, 70, 0.3);
+}
+
 .upload-zone {
     width: 100%;
     max-width: 400px;
