@@ -102,9 +102,9 @@ const Admin = {
                 <div class="category-info" style="font-size:12px; color:#888;">
                     ${c.subcategories ? c.subcategories.length : 0} подкат.
                 </div>
-                <div class="category-actions" onclick="event.stopPropagation()">
-                    <button class="btn-icon" onclick="Admin.openCategoryModal(${c.id})">✏️</button>
-                    <button class="btn-icon" style="color:red;" onclick="Admin.deleteCategory(${c.id})">🗑</button>
+                <div class="category-actions" onclick="event.stopPropagation()" style="display: flex; gap: 8px;">
+                    <button class="btn-icon-styled primary" onclick="Admin.openCategoryModal(${c.id})">✏️</button>
+                    <button class="btn-icon-styled danger" onclick="Admin.deleteCategory(${c.id})">🗑</button>
                 </div>
             </div>
         `).join('');
@@ -130,9 +130,9 @@ const Admin = {
                     <div class="category-info" style="font-size:12px; color:#888;">
                        Нажмите, чтобы открыть
                     </div>
-                    <div class="category-actions" onclick="event.stopPropagation()">
-                        <button class="btn-icon">✏️</button>
-                        <button class="btn-icon" style="color:red;" onclick="Admin.deleteSubcategory(${s.id})">🗑</button>
+                    <div class="category-actions" onclick="event.stopPropagation()" style="display: flex; gap: 8px;">
+                        <button class="btn-icon-styled primary" onclick="event.stopPropagation(); Admin.openSubcategoryModal(${category.id}, ${s.id})">✏️</button>
+                        <button class="btn-icon-styled danger" onclick="event.stopPropagation(); Admin.deleteSubcategory(${s.id})">🗑</button>
                     </div>
                 </div>
             `).join('') + `
