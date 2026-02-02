@@ -261,7 +261,7 @@ const Admin = {
     renderProductRow(p) {
         return `
             <tr>
-                <td><img src="${API.getImageUrl(p.image, 'small')}" onerror="this.src='assets/placeholder.svg'"></td>
+                <td><img src="${API.getImageUrl(p.images?.[0]?.file_id || p.images?.[0]?.image_url || p.image_file_id || p.image_url, 'small')}" onerror="this.src='assets/placeholder.svg'"></td>
                 <td>
                     <div style="font-weight:600;">${p.name}</div>
                     <div style="font-size:12px; color:#888;">Цена: ${p.price_per_unit}₽</div>

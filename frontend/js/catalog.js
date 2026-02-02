@@ -314,7 +314,7 @@ const Catalog = {
                 <div class="product-image-wrapper">
                     <img 
                         class="product-image skeleton" 
-                        src="${API.getImageUrl(product.image, 'small')}"
+                        src="${API.getImageUrl(product.images?.[0]?.file_id || product.images?.[0]?.image_url || product.image_file_id || product.image_url, 'small')}"
                         alt="${product.name}"
                         onload="this.classList.remove('skeleton'); this.classList.add('loaded');"
                         onerror="this.onerror=null; this.classList.remove('skeleton'); this.classList.add('loaded'); this.src='assets/placeholder.svg'"
