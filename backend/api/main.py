@@ -69,6 +69,32 @@ async def health():
     """Health check for Docker."""
     return {"status": "healthy"}
 
+@app.get("/api/debug/info")
+async def debug_info():
+    """Debug endpoint to check paths and files."""
+    import os
+    from pathlib import Path
+    
+    current_file = Path(__file__).resolve()
+    backend_root = current_file.parent.parent
+    static_dir = backend_root / "static"
+    uploads_dir = static_dir / "uploads"
+    
+    files = []
+    if os.path.exists(uploads_dir):
+        files = os.listdir(uploads_dir)
+        
+    return {
+        "current_file": str(current_file),
+        "backend_root": str(backend_root),
+        "static_dir": str(static_dir),
+        "uploads_dir": str(uploads_dir),
+        "uploads_exists": os.path.exists(uploads_dir),
+        "files_count": len(files),
+        "files_sample": files[:10],
+        "cwd": os.getcwd()
+    }
+
 # Serve Static Files (Frontend)
 # Use absolute path to ensure consistency
 from pathlib import Path
