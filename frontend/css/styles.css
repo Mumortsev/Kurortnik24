@@ -1559,7 +1559,8 @@ body {
 
 /* Rounded Admin Buttons */
 .nav-btn {
-    border-radius: 20px !important; /* Force rounded */
+    border-radius: 20px !important;
+    /* Force rounded */
     padding: 10px 20px;
     border: 1px solid var(--border-color);
     background: var(--bg-card);
@@ -1619,6 +1620,8 @@ body {
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
+    margin-top: 1px;
+    /* Visual correction */
     width: 24px;
     height: 24px;
     border: none;
@@ -1637,5 +1640,9 @@ body {
 .search-clear:active {
     background: var(--text-secondary);
     transform: translateY(-50%) scale(0.95);
+}
+/* Fine-tune search clear alignment */
+.search-clear {
+    margin-top: 1px !important; /* Visual correction for vertical alignment */
 }
 
