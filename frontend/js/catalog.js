@@ -23,6 +23,7 @@ const Catalog = {
     async init() {
         await this.loadCategories();
         this.setupEventListeners();
+        this.setupMenu();
         await this.loadProducts(true);
     },
 
@@ -33,8 +34,6 @@ const Catalog = {
         // Search
         const searchInput = document.getElementById('searchInput');
         const searchClear = document.getElementById('searchClear');
-
-
 
         // Debounce utility
         const debounce = (func, wait) => {
@@ -81,7 +80,7 @@ const Catalog = {
             this.loadProducts(true);
         });
 
-        // Infinite scroll - Using window scroll because mainContent might not trigger it directly if body scrolls
+        // Infinite scroll
         window.addEventListener('scroll', () => {
             if (this.isLoading || !this.hasMore) return;
 
@@ -93,7 +92,6 @@ const Catalog = {
             if (scrollTop + clientHeight >= scrollHeight - 300) {
                 this.loadMoreProducts();
             }
-
         }, { passive: true });
 
         // Load More Button (Manual Fallback)
@@ -102,6 +100,126 @@ const Catalog = {
             loadMoreBtn.addEventListener('click', () => {
                 this.loadMoreProducts();
             });
+        }
+    },
+
+    /**
+     * Setup menu event listeners
+     */
+    setupMenu() {
+        const closeBtn = document.getElementById('menuCloseBtn');
+        const backBtn = document.getElementById('menuBackBtn');
+
+        if (closeBtn) closeBtn.addEventListener('click', () => this.closeMenu());
+        if (backBtn) backBtn.addEventListener('click', () => this.showMenuCategories());
+    },
+
+    /**
+     * Open Catalog Menu
+     */
+    openMenu() {
+        const menu = document.getElementById('catalogMenuModal');
+        menu.classList.add('active');
+        this.showMenuCategories();
+        document.body.style.overflow = 'hidden';
+    },
+
+    /**
+     * Close Catalog Menu
+     */
+    closeMenu() {
+        const menu = document.getElementById('catalogMenuModal');
+        menu.classList.remove('active');
+        document.body.style.overflow = '';
+    },
+
+    /**
+     * Show main categories in menu
+     */
+    showMenuCategories() {
+        const title = document.getElementById('menuTitle');
+        const backBtn = document.getElementById('menuBackBtn');
+        const container = document.getElementById('catalogMenuContent');
+
+        title.textContent = 'Каталог';
+        backBtn.style.display = 'none';
+
+        let html = `
+            <div class="catalog-menu-item" onclick="Catalog.handleMenuSelection(null, null)">
+                <span class="catalog-menu-item-text">Все товары</span>
+                <span class="catalog-menu-item-icon">→</span>
+            </div>
+        `;
+
+        this.categories.forEach(cat => {
+            const hasSub = cat.subcategories && cat.subcategories.length > 0;
+            const clickAction = hasSub ?
+                `Catalog.showMenuSubcategories(${cat.id})` :
+                `Catalog.handleMenuSelection(${cat.id}, null)`;
+
+            html += `
+                <div class="catalog-menu-item" onclick="${clickAction}">
+                    <span class="catalog-menu-item-text">${cat.name}</span>
+                    <span class="catalog-menu-item-icon">${hasSub ? '→' : ''}</span>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    },
+
+    /**
+     * Show subcategories for a category
+     */
+    showMenuSubcategories(categoryId) {
+        const category = this.categories.find(c => c.id === categoryId);
+        if (!category) return;
+
+        const title = document.getElementById('menuTitle');
+        const backBtn = document.getElementById('menuBackBtn');
+        const container = document.getElementById('catalogMenuContent');
+
+        title.textContent = category.name;
+        backBtn.style.display = 'flex';
+
+        let html = `
+            <div class="catalog-menu-item" onclick="Catalog.handleMenuSelection(${category.id}, null)">
+                <span class="catalog-menu-item-text">Все в категории "${category.name}"</span>
+                <span class="catalog-menu-item-icon">→</span>
+            </div>
+        `;
+
+        category.subcategories.forEach(sub => {
+            if (sub.name === 'Все') return;
+            html += `
+                <div class="catalog-menu-item" onclick="Catalog.handleMenuSelection(${category.id}, ${sub.id})">
+                    <span class="catalog-menu-item-text">${sub.name}</span>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    },
+
+    /**
+     * Handle selection from menu
+     */
+    handleMenuSelection(categoryId, subcategoryId) {
+        this.closeMenu();
+        App.showCatalog(); // Ensure we are on listing page
+
+        if (categoryId === null) {
+            // "All Products"
+            this.selectCategory(null);
+        } else if (subcategoryId === null) {
+            // "All in Category"
+            this.selectCategory(categoryId);
+        } else {
+            // Specific subcategory
+            this.selectCategory(categoryId); // This renders subcat chips
+            setTimeout(() => {
+                this.selectSubcategory(subcategoryId); // This selects specific chip and reloads
+            }, 50);
         }
     },
 
@@ -386,8 +504,6 @@ const Catalog = {
         App.updateCartBadge();
 
         // Optional: Reset local counter to 1 for visual feedback? 
-        // Or keep it? User might want to add again. 
-        // I'll reset it to 1 to signify "transaction complete"
         this.localQuantities[productId] = 1;
         this.refreshCardControls(productId);
     },

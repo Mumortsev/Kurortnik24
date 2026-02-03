@@ -87,7 +87,7 @@ const App = {
         // Header Catalog Button
         const headerCatalogBtn = document.getElementById('headerCatalogBtn');
         if (headerCatalogBtn) {
-            headerCatalogBtn.addEventListener('click', () => this.showCatalog());
+            headerCatalogBtn.addEventListener('click', () => Catalog.openMenu());
         }
 
         // Checkout button
