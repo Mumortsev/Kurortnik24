@@ -146,7 +146,30 @@ body {
     /* Don't shrink catalog button */
 }
 
-/* Catalog button styles remain ... */
+/* Catalog button styles */
+.header-catalog-btn {
+    appearance: none;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    padding: 12px 24px;
+    border-radius: 30px;
+    /* Full pill shape */
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(27, 58, 95, 0.3);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-catalog-btn:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+}
 
 /* Search Container in Header Top */
 .search-container {
