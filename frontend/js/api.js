@@ -3,7 +3,7 @@
  */
 const API = {
     // Base URL - change to your server
-    baseUrl: 'https://kurortnik-genanana.waw0.amvera.tech/api',
+    baseUrl: window.location.origin + '/api',
 
     /**
      * Make API request
