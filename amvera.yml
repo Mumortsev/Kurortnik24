@@ -1,7 +1,7 @@
 build:
   dockerfile: Dockerfile
 run:
-  persistenceMounts:
-    - mountPoint: /app/data
-      name: data
+  persistenceMount:
+    mountPoint: /app/data
+    name: data
   containerPort: 8000
