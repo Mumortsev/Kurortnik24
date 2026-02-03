@@ -12,7 +12,10 @@ const App = {
      */
     async init() {
         try {
-            // Initialize cart first
+            // Setup event listeners immediately
+            this.setupEventListeners();
+
+            // Initialize cart
             Cart.init();
 
             // Telegram WebApp
@@ -23,10 +26,8 @@ const App = {
                 await Catalog.init();
             } catch (err) {
                 console.error('Catalog init failed:', err);
+                App.showToast('Ошибка загрузки каталога');
             }
-
-            // Setup event listeners
-            this.setupEventListeners();
 
             // Update cart badges
             this.updateCartBadge();

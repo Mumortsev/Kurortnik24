@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#F5F0E8">
     <title>Курортник - Оптовый магазин</title>
-    <link rel="stylesheet" href="css/styles.css?v=3.4">
+    <link rel="stylesheet" href="css/styles.css?v=3.5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
@@ -15,6 +15,22 @@
 </head>
 
 <body>
+    <div id="debug-console"
+        style="position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.8); color:red; font-size:12px; padding:10px; z-index:9999; max-height:150px; overflow:auto; display:none;">
+    </div>
+    <script>
+        window.onerror = function (msg, url, line) {
+            var d = document.getElementById('debug-console');
+            d.style.display = 'block';
+            d.innerHTML += 'E: ' + msg + ' (' + line + ')<br>';
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function (e) {
+            var d = document.getElementById('debug-console');
+            d.style.display = 'block';
+            d.innerHTML += 'UR: ' + e.reason + '<br>';
+        });
+    </script>
     <div id="app">
         <!-- Header -->
         <header class="header">
@@ -304,10 +320,10 @@
         <button class="scroll-top" id="scrollTop" style="display: none;">↑</button>
     </div>
 
-    <script src="js/api.js?v=3.4"></script>
-    <script src="js/cart.js?v=3.4"></script>
-    <script src="js/catalog.js?v=3.4"></script>
-    <script src="js/app.js?v=3.4"></script>
+    <script src="js/api.js?v=3.5"></script>
+    <script src="js/cart.js?v=3.5"></script>
+    <script src="js/catalog.js?v=3.5"></script>
+    <script src="js/app.js?v=3.5"></script>
 </body>
 
 </html>
