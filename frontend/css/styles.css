@@ -150,20 +150,25 @@ body {
 .header-catalog-btn {
     appearance: none;
     border: none;
-    background: transparent;
-    font-size: 24px;
-    font-weight: 800;
-    /* Extra bold for premium feel */
+    background: var(--primary-color);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
     font-family: var(--font-family);
-    color: var(--text-primary);
+    padding: 10px 20px;
+    border-radius: 30px;
+    /* Full pill shape */
     cursor: pointer;
-    padding: 0;
-    letter-spacing: -0.5px;
-    transition: opacity 0.2s ease;
+    box-shadow: 0 2px 8px rgba(27, 58, 95, 0.3);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header-catalog-btn:active {
-    opacity: 0.7;
+    transform: scale(0.96);
+    opacity: 0.9;
 }
 
 .logo {
@@ -1760,100 +1765,101 @@ body {
 .upload-text-sub {
     font-size: 13px;
     opacity: 0.8;
-}/ *   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
-       C a t a l o g   M e n u   M o d a l  
-       = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =   * /  
- . c a t a l o g - m e n u - m o d a l   {  
-         p o s i t i o n :   f i x e d ;  
-         t o p :   0 ;  
-         l e f t :   0 ;  
-         r i g h t :   0 ;  
-         b o t t o m :   0 ;  
-         z - i n d e x :   2 0 0 0 ;  
-         b a c k g r o u n d :   v a r ( - - b g - p r i m a r y ) ;  
-         t r a n s f o r m :   t r a n s l a t e X ( - 1 0 0 % ) ;  
-         t r a n s i t i o n :   t r a n s f o r m   v a r ( - - t r a n s i t i o n - n o r m a l )   c u b i c - b e z i e r ( 0 . 4 ,   0 . 0 ,   0 . 2 ,   1 ) ;  
-         d i s p l a y :   f l e x ;  
-         f l e x - d i r e c t i o n :   c o l u m n ;  
- }  
-  
- . c a t a l o g - m e n u - m o d a l . a c t i v e   {  
-         t r a n s f o r m :   t r a n s l a t e X ( 0 ) ;  
- }  
-  
- . c a t a l o g - m e n u - h e a d e r   {  
-         d i s p l a y :   f l e x ;  
-         a l i g n - i t e m s :   c e n t e r ;  
-         j u s t i f y - c o n t e n t :   s p a c e - b e t w e e n ;  
-         p a d d i n g :   v a r ( - - s p a c i n g - m d ) ;  
-         b a c k g r o u n d :   v a r ( - - b g - s e c o n d a r y ) ;  
-         b o x - s h a d o w :   v a r ( - - s h a d o w - s m ) ;  
-         h e i g h t :   6 0 p x ;  
- }  
-  
- . m e n u - t i t l e   {  
-         f o n t - s i z e :   1 8 p x ;  
-         f o n t - w e i g h t :   7 0 0 ;  
-         f l e x :   1 ;  
-         t e x t - a l i g n :   c e n t e r ;  
-         m a r g i n :   0 ;  
- }  
-  
- . m e n u - c l o s e - b t n ,  
- . m e n u - b a c k - b t n   {  
-         w i d t h :   4 0 p x ;  
-         h e i g h t :   4 0 p x ;  
-         b o r d e r :   n o n e ;  
-         b a c k g r o u n d :   t r a n s p a r e n t ;  
-         c o l o r :   v a r ( - - t e x t - p r i m a r y ) ;  
-         d i s p l a y :   f l e x ;  
-         a l i g n - i t e m s :   c e n t e r ;  
-         j u s t i f y - c o n t e n t :   c e n t e r ;  
-         c u r s o r :   p o i n t e r ;  
-         b o r d e r - r a d i u s :   5 0 % ;  
- }  
-  
- . m e n u - c l o s e - b t n : a c t i v e ,  
- . m e n u - b a c k - b t n : a c t i v e   {  
-         b a c k g r o u n d :   r g b a ( 0 ,   0 ,   0 ,   0 . 0 5 ) ;  
- }  
-  
- . c a t a l o g - m e n u - c o n t e n t   {  
-         f l e x :   1 ;  
-         o v e r f l o w - y :   a u t o ;  
-         p a d d i n g :   v a r ( - - s p a c i n g - m d ) ;  
- }  
-  
- . c a t a l o g - m e n u - i t e m   {  
-         d i s p l a y :   f l e x ;  
-         a l i g n - i t e m s :   c e n t e r ;  
-         j u s t i f y - c o n t e n t :   s p a c e - b e t w e e n ;  
-         p a d d i n g :   1 6 p x ;  
-         b a c k g r o u n d :   v a r ( - - b g - c a r d ) ;  
-         b o r d e r - r a d i u s :   v a r ( - - b o r d e r - r a d i u s - s m ) ;  
-         m a r g i n - b o t t o m :   v a r ( - - s p a c i n g - s m ) ;  
-         c u r s o r :   p o i n t e r ;  
-         b o x - s h a d o w :   v a r ( - - s h a d o w - s m ) ;  
-         t r a n s i t i o n :   a l l   v a r ( - - t r a n s i t i o n - f a s t ) ;  
- }  
-  
- . c a t a l o g - m e n u - i t e m : a c t i v e   {  
-         t r a n s f o r m :   s c a l e ( 0 . 9 8 ) ;  
- }  
-  
- . c a t a l o g - m e n u - i t e m - t e x t   {  
-         f o n t - s i z e :   1 6 p x ;  
-         f o n t - w e i g h t :   5 0 0 ;  
-         c o l o r :   v a r ( - - t e x t - p r i m a r y ) ;  
- }  
-  
- . c a t a l o g - m e n u - i t e m - i c o n   {  
-         c o l o r :   v a r ( - - t e x t - m u t e d ) ;  
- }  
-  
- / *   E n s u r e   h e a d e r   b u t t o n   h a s   f l e x   d i s p l a y   f o r   i c o n   a l i g n m e n t   * /  
- . h e a d e r - c a t a l o g - b t n   {  
-         d i s p l a y :   f l e x ;  
-         a l i g n - i t e m s :   c e n t e r ;  
- }  
- 
+}
+
+/* =====================================================
+   Catalog Menu Modal
+   ===================================================== */
+.catalog-menu-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    background: var(--bg-primary);
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal) cubic-bezier(0.4, 0.0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.catalog-menu-modal.active {
+    transform: translateX(0);
+}
+
+.catalog-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    box-shadow: var(--shadow-sm);
+    height: 60px;
+}
+
+.menu-title {
+    font-size: 18px;
+    font-weight: 700;
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+.menu-close-btn,
+.menu-back-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.menu-close-btn:active,
+.menu-back-btn:active {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.catalog-menu-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+.catalog-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+}
+
+.catalog-menu-item:active {
+    transform: scale(0.98);
+}
+
+.catalog-menu-item-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.catalog-menu-item-icon {
+    color: var(--text-muted);
+}
+
+/* Ensure header button has flex display for icon alignment */
+.header-catalog-btn {
+    display: flex;
+    align-items: center;
+}

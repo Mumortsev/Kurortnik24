@@ -1,0 +1,96 @@
+/* =====================================================
+   Catalog Menu Modal
+   ===================================================== */
+.catalog-menu-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    background: var(--bg-primary);
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal) cubic-bezier(0.4, 0.0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.catalog-menu-modal.active {
+    transform: translateX(0);
+}
+
+.catalog-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    box-shadow: var(--shadow-sm);
+    height: 60px;
+}
+
+.menu-title {
+    font-size: 18px;
+    font-weight: 700;
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+.menu-close-btn,
+.menu-back-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.menu-close-btn:active,
+.menu-back-btn:active {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.catalog-menu-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+.catalog-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+}
+
+.catalog-menu-item:active {
+    transform: scale(0.98);
+}
+
+.catalog-menu-item-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.catalog-menu-item-icon {
+    color: var(--text-muted);
+}
+
+/* Ensure header button has flex display for icon alignment */
+.header-catalog-btn {
+    display: flex;
+    align-items: center;
+}
