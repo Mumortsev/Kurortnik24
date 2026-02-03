@@ -1,0 +1,10 @@
+version: "2"
+meta:
+  name: kurortnik
+run:
+  persistence:
+    - mountPoint: /app/data
+      name: data
+  containerPort: 8000
+  build:
+    dockerfile: Dockerfile
