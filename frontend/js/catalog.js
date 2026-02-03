@@ -247,36 +247,11 @@ const Catalog = {
     /**
      * Render categories
      */
+    /**
+     * Render categories - Only for internal state, logic moved to Menu
+     */
     renderCategories() {
-        const container = document.getElementById('categoriesSwipe');
-
-        // "All" chip first
-        let html = `<button class="category-chip all ${!this.currentCategory ? 'active' : ''}" data-id="">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="5" cy="5" r="3"/>
-                <circle cx="12" cy="5" r="3"/>
-                <circle cx="19" cy="5" r="3"/>
-                <circle cx="5" cy="12" r="3"/>
-                <circle cx="12" cy="12" r="3"/>
-                <circle cx="19" cy="12" r="3"/>
-            </svg>
-            Все товары
-        </button>`;
-
-        // Category chips
-        this.categories.forEach(cat => {
-            const isActive = this.currentCategory === cat.id;
-            html += `<button class="category-chip ${isActive ? 'active' : ''}" data-id="${cat.id}">
-                ${cat.name}
-            </button>`;
-        });
-
-        container.innerHTML = html;
-
-        // Click handlers
-        container.querySelectorAll('.category-chip').forEach(chip => {
-            chip.addEventListener('click', () => this.selectCategory(chip.dataset.id));
-        });
+        // Legacy chip rendering removed
     },
 
     /**
@@ -286,49 +261,15 @@ const Catalog = {
         const id = categoryId ? parseInt(categoryId) : null;
         this.currentCategory = id;
         this.currentSubcategory = null;
-
-        // Update active state
-        document.querySelectorAll('.category-chip').forEach(chip => {
-            const chipId = chip.dataset.id ? parseInt(chip.dataset.id) : null;
-            chip.classList.toggle('active', chipId === id);
-        });
-
-        // Render subcategories
-        if (id) {
-            const category = this.categories.find(c => c.id === id);
-            if (category && category.subcategories && category.subcategories.length > 0) {
-                this.renderSubcategories(category.subcategories);
-            } else {
-                document.getElementById('subcategoriesSwipe').style.display = 'none';
-            }
-        } else {
-            document.getElementById('subcategoriesSwipe').style.display = 'none';
-        }
-
-        this.updateHeaderHeight();
         this.loadProducts(true);
     },
 
     /**
-     * Render subcategories
+     * Format price
      */
-    renderSubcategories(subcategories) {
-        const container = document.getElementById('subcategoriesSwipe');
-
-        let html = `<button class="subcategory-chip ${!this.currentSubcategory ? 'active' : ''}" data-id="">Все</button>`;
-
-        subcategories.forEach(sub => {
-            if (sub.name === 'Все') return;
-            const isActive = this.currentSubcategory === sub.id;
-            html += `<button class="subcategory-chip ${isActive ? 'active' : ''}" data-id="${sub.id}">${sub.name}</button>`;
-        });
-
-        container.innerHTML = html;
-        container.style.display = 'flex';
-
-        container.querySelectorAll('.subcategory-chip').forEach(chip => {
-            chip.addEventListener('click', () => this.selectSubcategory(chip.dataset.id));
-        });
+    formatPrice(price) {
+        if (!price) return '0';
+        return Math.round(price * 100) / 100;
     },
 
     /**
@@ -337,22 +278,14 @@ const Catalog = {
     selectSubcategory(subcategoryId) {
         const id = subcategoryId ? parseInt(subcategoryId) : null;
         this.currentSubcategory = id;
-
-        document.querySelectorAll('.subcategory-chip').forEach(chip => {
-            const chipId = chip.dataset.id ? parseInt(chip.dataset.id) : null;
-            chip.classList.toggle('active', chipId === id);
-        });
-
         this.loadProducts(true);
     },
 
     /**
-     * Update header height
+     * Update header height - No longer needed
      */
     updateHeaderHeight() {
-        const subcats = document.getElementById('subcategoriesSwipe');
-        const hasSubcats = subcats.style.display !== 'none';
-        document.documentElement.style.setProperty('--header-height', hasSubcats ? '240px' : '200px');
+        // No-op
     },
 
     /**
@@ -417,7 +350,10 @@ const Catalog = {
      * Load more products
      */
     loadMoreProducts() {
-        if (this.isLoading || !this.hasMore) return;
+        if (!this.hasMore) return;
+        if (this.isLoading) return;
+
+        console.log('Loading more products page:', this.currentPage + 1);
         this.currentPage++;
         this.loadProducts(false);
     },
