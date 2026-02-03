@@ -34,22 +34,9 @@
                     </button>
                 </div>
 
-                <!-- Welcome Right -->
-                <div class="header-right">
-                    <div class="welcome-message" id="welcomeMessage">Добро пожаловать!</div>
-                    <!-- Hidden Cart for JS compatibility -->
-                    <div class="header-actions" style="display: none;">
-                        <button class="header-btn" id="cartBtnHeader" title="Корзина">
-                            <span class="cart-badge" id="cartBadge">0</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Search & Sort Row -->
-            <div class="header-controls">
-                <div class="search-container" id="searchContainer">
-
+                <!-- Search Right -->
+                <div class="search-container" id="searchContainer"
+                    style="margin-left: 12px; margin-bottom: 0; flex: 1;">
                     <input type="text" class="search-input" id="searchInput" placeholder="Поиск">
                     <button class="search-clear" id="searchClear" style="display: none;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -59,8 +46,11 @@
                         </svg>
                     </button>
                 </div>
+            </div>
 
-                <div class="sort-container">
+            <!-- Sort Row -->
+            <div class="header-controls">
+                <div class="sort-container" style="flex: 1;">
                     <select class="sort-select" id="sortSelect">
                         <option value="name_asc">По умолчанию</option>
                         <option value="newest">Новые</option>

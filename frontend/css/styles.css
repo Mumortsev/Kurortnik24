@@ -131,13 +131,10 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    /* Center vertically */
     justify-content: space-between;
     margin-bottom: var(--spacing-sm);
-    /* Space between logo row and search row */
     padding-right: 0;
     height: 50px;
-    /* Fixed height for alignment */
 }
 
 .logo-container {
@@ -145,107 +142,19 @@ body {
     margin-bottom: 0;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
+    /* Don't shrink catalog button */
 }
 
-.header-catalog-btn {
-    appearance: none;
-    border: none;
-    background: var(--primary-color);
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: var(--font-family);
-    padding: 10px 20px;
-    border-radius: 30px;
-    /* Full pill shape */
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(27, 58, 95, 0.3);
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/* Catalog button styles remain ... */
 
-.header-catalog-btn:active {
-    transform: scale(0.96);
-    opacity: 0.9;
-}
-
-.logo {
-    height: 44px;
-    /* Increased back to reasonable size */
-    width: auto;
-    object-fit: contain;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-/* Welcome message */
-.welcome-message {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-    text-align: right;
+/* Search Container in Header Top */
+.search-container {
+    position: relative;
+    flex: 1;
+    margin-left: 12px;
     margin-bottom: 0;
-    line-height: 1;
-    /* Reset line height for better alignment */
-    padding-top: 4px;
-    /* Visual tweak to match logo text baseline */
 }
-
-.header-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-    margin-left: var(--spacing-sm);
-}
-
-.header-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.header-btn:active {
-    transform: scale(0.95);
-    background: var(--border-color);
-}
-
-.cart-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    min-width: 20px;
-    height: 20px;
-    background: var(--accent-danger);
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 5px;
-    border: 2px solid var(--bg-secondary);
-    pointer-events: none;
-}
-
-
-
-
-
-/* ... */
 
 .header-controls {
     display: flex;
@@ -254,11 +163,10 @@ body {
     margin-top: 0;
 }
 
-.search-container {
-    position: relative;
+/* Sort container now takes full width in the second row */
+.sort-container {
     flex: 1;
-    /* Take half width */
-    margin-bottom: 0;
+    width: 100%;
 }
 
 .search-input {

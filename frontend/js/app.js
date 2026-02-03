@@ -28,9 +28,6 @@ const App = {
 
         // Check for existing session
         this.checkAuth();
-
-        // Update welcome message
-        this.updateWelcomeMessage();
     },
 
     /**
@@ -67,6 +64,8 @@ const App = {
      */
     updateWelcomeMessage() {
         const welcomeEl = document.getElementById('welcomeMessage');
+        if (!welcomeEl) return;
+
         if (this.user && this.user.first_name) {
             welcomeEl.textContent = `Добро пожаловать, ${this.user.first_name}!`;
         } else {
