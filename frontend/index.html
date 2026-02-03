@@ -16,6 +16,15 @@
 
 <body>
     <div id="app">
+        <script>
+            window.onerror = function (msg, url, line, col, error) {
+                alert("Error: " + msg + "\nLine: " + line + "\nCol: " + col + "\nStack: " + (error ? error.stack : 'no stack'));
+                return false;
+            };
+            window.addEventListener('unhandledrejection', function (event) {
+                alert("Unhandled Rejection: " + event.reason);
+            });
+        </script>
         <!-- Header -->
         <header class="header">
             <!-- Header items in one row -->
@@ -304,10 +313,10 @@
         <button class="scroll-top" id="scrollTop" style="display: none;">↑</button>
     </div>
 
-    <script src="js/api.js?v=3.2"></script>
-    <script src="js/cart.js?v=3.2"></script>
-    <script src="js/catalog.js?v=3.2"></script>
-    <script src="js/app.js?v=3.2"></script>
+    <script src="js/api.js?v=3.3"></script>
+    <script src="js/cart.js?v=3.3"></script>
+    <script src="js/catalog.js?v=3.3"></script>
+    <script src="js/app.js?v=3.3"></script>
 </body>
 
 </html>
