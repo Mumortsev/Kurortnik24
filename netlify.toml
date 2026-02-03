@@ -5,7 +5,7 @@
 # Настройка прокси для API
 [[redirects]]
   from = "/api/*"
-  to = "https://kurortnik24-production.up.railway.app/api/:splat"
+  to = "https://kurortnik-genanana.waw0.amvera.tech/api/:splat"
   status = 200
 
 # Поддержка SPA (перенаправление всех путей на index.html)

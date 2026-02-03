@@ -3,7 +3,7 @@
  */
 const API = {
     // Base URL - change to your server
-    baseUrl: 'https://kurortnik24-production-7a2c.up.railway.app/api',
+    baseUrl: 'https://kurortnik-genanana.waw0.amvera.tech/api',
 
     /**
      * Make API request
