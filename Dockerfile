@@ -4,7 +4,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Set environment variables
-ENV PIP_DEFAULT_TIMEOUT=100 \
+ENV PIP_DEFAULT_TIMEOUT=1000 \
     PYTHONUNBUFFERED=1
 
 # Install system dependencies
@@ -18,7 +18,7 @@ COPY backend/requirements.txt /app/
 
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --default-timeout=100 -r requirements.txt
+    pip install --no-cache-dir --default-timeout=1000 --retries 10 -r requirements.txt
 
 # Copy backend code
 COPY backend/ /app/
