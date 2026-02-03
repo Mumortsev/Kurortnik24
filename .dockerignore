@@ -1,0 +1,46 @@
+# Исключаем из Docker-сборки
+.git
+.gitignore
+.env
+*.env.local
+
+# Базы данных
+*.db
+*.sqlite
+*.sqlite3
+data/
+backend/data/
+
+# Python кэш
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+env/
+
+# Конфиги других платформ
+railway.toml
+netlify.toml
+Procfile
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+
+# Документация
+README.md
+*.md
+
+# Логи
+*.log
+*.txt
+
+# OS
+.DS_Store
+Thumbs.db
