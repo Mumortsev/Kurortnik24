@@ -28,10 +28,10 @@ COPY scripts/ /app/scripts/
 RUN dos2unix /app/scripts/start.sh && chmod +x /app/scripts/start.sh
 
 # Create data directory
-RUN mkdir -p /app/data
+RUN mkdir -p /data
 
 # Expose port
-EXPOSE 8000
+EXPOSE 80
 
 # Set Python path
 ENV PYTHONPATH=/app
