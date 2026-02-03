@@ -1,16 +1,8 @@
-version: null
 meta:
   environment: docker
   toolchain:
     name: docker
-    version: latest
 build:
   dockerfile: Dockerfile
-  skip: false
 run:
-  persistenceMounts:
-    - mountPoint: /data
-      name: data
   containerPort: 80
-  persistenceMount: /data
-serviceType: compute
