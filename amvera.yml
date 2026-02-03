@@ -1,10 +1,11 @@
-version: "2"
 meta:
-  name: kurortnik
+  environment: docker
+  toolchain:
+    name: docker
+build:
+  dockerfile: Dockerfile
 run:
-  persistence:
+  persistenceMounts:
     - mountPoint: /app/data
       name: data
   containerPort: 8000
-  build:
-    dockerfile: Dockerfile

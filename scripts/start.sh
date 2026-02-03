@@ -1,14 +1,27 @@
 #!/bin/bash
 set -e
 
-# Define API URL for the bot based on Railway PORT
-export API_URL="http://127.0.0.1:${PORT:-8000}"
+# Use 8000 as default port if not provided by Amvera
+PORT=${PORT:-8000}
+echo "Running on port: $PORT"
+
+# Ensure database is initialized in the persistent volume if using SQLite
+if [[ "$DATABASE_URL" == *"sqlite"* ]] || [ -z "$DATABASE_URL" ]; then
+    echo "Using SQLite database. Ensuring volume directory exists..."
+    mkdir -p /app/data
+    
+    # Initialize DB tables and demo data if needed
+    echo "Running database initialization..."
+    python scripts/init_db.py --demo
+fi
+
+# Define API URL for the bot
+export API_URL="http://127.0.0.1:$PORT"
 
 # Start Telegram Bot in background
-echo "Starting Telegram Bot with API_URL=$API_URL..."
+echo "Starting Telegram Bot..."
 python -m bot.main &
 
 # Start FastAPI server in foreground
-# Use PORT env var provided by Railway
-echo "Starting FastAPI server on port ${PORT:-8000}..."
-exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+echo "Starting FastAPI server..."
+exec uvicorn api.main:app --host 0.0.0.0 --port $PORT
