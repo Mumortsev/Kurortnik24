@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-# Use 8000 as default port if not provided by Amvera
-PORT=${PORT:-8000}
+# Use 80 as default port for Amvera
+PORT=${PORT:-80}
 echo "Running on port: $PORT"
 
-# Ensure database is initialized in the persistent volume if using SQLite
+# Ensure database is initialized in the persistent volume
 if [[ "$DATABASE_URL" == *"sqlite"* ]] || [ -z "$DATABASE_URL" ]; then
-    echo "Using SQLite database. Ensuring volume directory exists..."
-    mkdir -p /app/data
+    echo "Using SQLite database. Ensuring /data directory exists..."
+    mkdir -p /data
     
     # Initialize DB tables and demo data if needed
     echo "Running database initialization..."
