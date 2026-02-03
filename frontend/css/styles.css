@@ -1862,4 +1862,8 @@ body {
 .header-catalog-btn {
     display: flex;
     align-items: center;
+    padding: 12px 24px;
+    /* Increased padding */
+    font-size: 16px;
+    /* Increased font size */
 }
