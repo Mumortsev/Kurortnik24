@@ -1,7 +1,10 @@
+version: "1"
+meta:
+  environment: docker
 build:
   dockerfile: Dockerfile
 run:
-  persistenceMount:
-    mountPoint: /app/data
-    name: data
   containerPort: 8000
+  persistence:
+    - mountPoint: /app/data
+      name: data
