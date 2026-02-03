@@ -84,6 +84,12 @@ const App = {
         document.getElementById('checkoutBackBtn').addEventListener('click', () => this.showCart());
         document.getElementById('profileBackBtn').addEventListener('click', () => this.showCatalog());
 
+        // Header Catalog Button
+        const headerCatalogBtn = document.getElementById('headerCatalogBtn');
+        if (headerCatalogBtn) {
+            headerCatalogBtn.addEventListener('click', () => this.showCatalog());
+        }
+
         // Checkout button
         document.getElementById('checkoutBtn').addEventListener('click', () => {
             this.showView('checkoutView');
@@ -510,7 +516,8 @@ const App = {
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
         if (viewId === 'productsView') {
-            document.getElementById('navHome').classList.add('active');
+            const navHome = document.getElementById('navHome');
+            if (navHome) navHome.classList.add('active');
         } else if (viewId === 'cartView') {
             document.getElementById('navCart').classList.add('active');
         } else if (viewId === 'profileView') {
