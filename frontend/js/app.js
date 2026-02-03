@@ -11,23 +11,31 @@ const App = {
      * Initialize app
      */
     async init() {
-        // Initialize cart first
-        Cart.init();
+        try {
+            // Initialize cart first
+            Cart.init();
 
-        // Telegram WebApp
-        this.initTelegramWebApp();
+            // Telegram WebApp
+            this.initTelegramWebApp();
 
-        // Initialize modules
-        await Catalog.init();
+            // Initialize modules with error handling
+            try {
+                await Catalog.init();
+            } catch (err) {
+                console.error('Catalog init failed:', err);
+            }
 
-        // Setup event listeners
-        this.setupEventListeners();
+            // Setup event listeners
+            this.setupEventListeners();
 
-        // Update cart badges
-        this.updateCartBadge();
+            // Update cart badges
+            this.updateCartBadge();
 
-        // Check for existing session
-        this.checkAuth();
+            // Check for existing session
+            this.checkAuth();
+        } catch (error) {
+            console.error('App init failed:', error);
+        }
     },
 
     /**

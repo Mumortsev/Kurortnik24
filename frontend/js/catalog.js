@@ -50,6 +50,7 @@ const Catalog = {
 
         // Search execution function
         const performSearch = () => {
+            if (!searchInput) return;
             const query = searchInput.value.trim();
             this.searchQuery = query;
             this.loadProducts(true);
@@ -59,26 +60,32 @@ const Catalog = {
         const debouncedSearch = debounce(() => performSearch(), 400);
 
         // Input handler - Real-time search
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value;
-            searchClear.style.display = query ? 'flex' : 'none';
-            debouncedSearch();
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value;
+                if (searchClear) searchClear.style.display = query ? 'flex' : 'none';
+                debouncedSearch();
+            });
+        }
 
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            searchClear.style.display = 'none';
-            this.searchQuery = '';
-            this.loadProducts(true);
-            searchInput.focus();
-        });
+        if (searchClear && searchInput) {
+            searchClear.addEventListener('click', () => {
+                searchInput.value = '';
+                searchClear.style.display = 'none';
+                this.searchQuery = '';
+                this.loadProducts(true);
+                searchInput.focus();
+            });
+        }
 
         // Sort
         const sortSelect = document.getElementById('sortSelect');
-        sortSelect.addEventListener('change', (e) => {
-            this.sortBy = e.target.value;
-            this.loadProducts(true);
-        });
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.sortBy = e.target.value;
+                this.loadProducts(true);
+            });
+        }
 
         // Infinite scroll
         window.addEventListener('scroll', () => {
