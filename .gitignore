@@ -42,3 +42,13 @@ docker-compose.override.yml
 
 # Uploaded files
 uploads/
+
+# Excel data files
+*.xlsx
+*.xls
+
+# Archives
+*.zip
+
+# Utilities
+ngrok*
