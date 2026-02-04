@@ -144,6 +144,7 @@ const Catalog = {
      * Show main categories in menu
      */
     showMenuCategories() {
+        console.log('Rendering menu categories. Count:', this.categories.length);
         const title = document.getElementById('menuTitle');
         const backBtn = document.getElementById('menuBackBtn');
         const container = document.getElementById('catalogMenuContent');
@@ -158,19 +159,23 @@ const Catalog = {
             </div>
         `;
 
-        this.categories.forEach(cat => {
-            const hasSub = cat.subcategories && cat.subcategories.length > 0;
-            const clickAction = hasSub ?
-                `Catalog.showMenuSubcategories(${cat.id})` :
-                `Catalog.handleMenuSelection(${cat.id}, null)`;
+        if (!this.categories || this.categories.length === 0) {
+            html += `<div style="padding: 20px; text-align: center; color: #999;">Нет категорий</div>`;
+        } else {
+            this.categories.forEach(cat => {
+                const hasSub = cat.subcategories && cat.subcategories.length > 0;
+                const clickAction = hasSub ?
+                    `Catalog.showMenuSubcategories(${cat.id})` :
+                    `Catalog.handleMenuSelection(${cat.id}, null)`;
 
-            html += `
-                <div class="catalog-menu-item" onclick="${clickAction}">
-                    <span class="catalog-menu-item-text">${cat.name}</span>
-                    <span class="catalog-menu-item-icon">${hasSub ? '→' : ''}</span>
-                </div>
-            `;
-        });
+                html += `
+                    <div class="catalog-menu-item" onclick="${clickAction}">
+                        <span class="catalog-menu-item-text">${cat.name}</span>
+                        <span class="catalog-menu-item-icon">${hasSub ? '→' : ''}</span>
+                    </div>
+                `;
+            });
+        }
 
         container.innerHTML = html;
     },
@@ -235,11 +240,26 @@ const Catalog = {
      */
     async loadCategories() {
         try {
+            console.log('Loading categories...');
             const data = await API.getCategories();
+            console.log('Categories API response:', data);
+
             this.categories = data.categories || data || [];
+            console.log('Parsed categories:', this.categories);
+
+            // Debug output to screen if debug console exists
+            const debugEl = document.getElementById('debug-console');
+            if (debugEl) {
+                debugEl.innerHTML += `Cats loaded: ${this.categories.length}<br>`;
+            }
+
             this.renderCategories();
         } catch (error) {
             console.error('Failed to load categories:', error);
+            const debugEl = document.getElementById('debug-console');
+            if (debugEl) {
+                debugEl.innerHTML += `Err loading cats: ${error.message}<br>`;
+            }
             this.categories = [];
         }
     },
