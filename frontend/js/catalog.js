@@ -167,15 +167,22 @@ const Catalog = {
         `;
 
         if (!this.categories || this.categories.length === 0) {
-            html += `<div style="padding: 20px; text-align: center; color: #999;">
-                Нет категорий<br>
-                <div style="font-size: 10px; color: #f00; margin-top: 10px; white-space: pre-wrap; word-break: break-all;">
-                    DEBUG: ${JSON.stringify(this.lastApiResponse || 'No data captured')}
-                </div>
-                <button onclick="Catalog.loadCategories()" class="btn btn-primary" style="margin-top: 15px; width: 100%;">
-                    Загрузить снова
-                </button>
-            </div>`;
+            if (this.lastApiResponse === 'Started loading...') {
+                html += `<div style="padding: 40px; text-align: center; color: #999;">
+                    <div class="spinner" style="margin: 0 auto 15px auto;"></div>
+                    Загрузка категорий...
+                </div>`;
+            } else {
+                html += `<div style="padding: 20px; text-align: center; color: #999;">
+                    Нет категорий<br>
+                    <div style="font-size: 10px; color: #f00; margin-top: 10px; white-space: pre-wrap; word-break: break-all;">
+                        DEBUG: ${JSON.stringify(this.lastApiResponse || 'No data captured')}
+                    </div>
+                    <button onclick="Catalog.loadCategories()" class="btn btn-primary" style="margin-top: 15px; width: 100%;">
+                        Загрузить снова
+                    </button>
+                </div>`;
+            }
         } else {
             this.categories.forEach(cat => {
                 const hasSub = cat.subcategories && cat.subcategories.length > 0;
