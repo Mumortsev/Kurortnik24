@@ -127,7 +127,14 @@ const Catalog = {
     openMenu() {
         const menu = document.getElementById('catalogMenuModal');
         menu.classList.add('active');
-        this.showMenuCategories();
+
+        // Ensure categories are loaded
+        if (!this.categories || this.categories.length === 0) {
+            this.loadCategories();
+        } else {
+            this.showMenuCategories();
+        }
+
         document.body.style.overflow = 'hidden';
     },
 
