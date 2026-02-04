@@ -97,6 +97,8 @@ async def debug_info():
 
 # Serve Static Files (Frontend)
 # Use absolute path to ensure consistency
+from pathlib import Path
+
 # Determine if running in Docker
 is_docker = os.path.exists("/app/static")
 
