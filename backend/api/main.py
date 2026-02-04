@@ -95,6 +95,20 @@ async def debug_info():
         "cwd": os.getcwd()
     }
 
+@app.get("/debug-files")
+async def debug_files_list():
+    """List all files in static directory."""
+    import os
+    path = "/app/static"
+    try:
+        if os.path.exists(path):
+            files = os.listdir(path)
+            return {"path": path, "exists": True, "files": files}
+        else:
+            return {"path": path, "exists": False}
+    except Exception as e:
+        return {"error": str(e)}
+
 # Serve Static Files (Frontend)
 # Use absolute path to ensure consistency
 from pathlib import Path
