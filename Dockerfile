@@ -11,13 +11,15 @@ ENV PIP_DEFAULT_TIMEOUT=1000 \
 RUN apt-get update && apt-get install -y \
     curl \
     dos2unix \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements first for caching
 COPY backend/requirements.txt /app/
 
-# Install dependencies
-RUN pip install --no-cache-dir --prefer-binary --default-timeout=1000 --retries 10 -r requirements.txt
+# Upgrade pip and install dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --prefer-binary --default-timeout=1000 --retries 10 -r requirements.txt
 
 # Copy backend code
 COPY backend/ /app/
