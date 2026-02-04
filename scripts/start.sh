@@ -6,8 +6,17 @@ PORT=${PORT:-80}
 echo "Running on port: $PORT"
 
 # Ensure database is initialized in the persistent volume
-if [[ "$DATABASE_URL" == *"sqlite"* ]] || [ -z "$DATABASE_URL" ]; then
-    echo "Using SQLite database. Ensuring /data directory exists..."
+# Set DB path to persistence volume if not set
+if [ -z "$DATABASE_URL" ]; then
+    # 4 slashes = absolute path on linux (file:///)
+    export DATABASE_URL="sqlite+aiosqlite:////data/shop.db"
+    echo "Using persistent database: $DATABASE_URL"
+fi
+
+# Ensure database is initialized in the persistent volume
+# Check if we are using sqlite (default)
+if [[ "$DATABASE_URL" == *"sqlite"* ]]; then
+    echo "Ensuring /data directory exists..."
     mkdir -p /data
     
     # Initialize DB tables and demo data if needed
