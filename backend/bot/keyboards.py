@@ -26,7 +26,8 @@ def get_admin_menu_keyboard() -> InlineKeyboardMarkup:
     
     # New Web Admin Panel
     from aiogram.types import WebAppInfo
-    web_app_url = "https://kurortnik24-production-7a2c.up.railway.app/admin.html"
+    import os
+    web_app_url = f"{os.getenv('WEBAPP_URL')}/admin.html"
     
     builder.row(
         InlineKeyboardButton(text="🌐 Открыть WEB Админ-панель", web_app=WebAppInfo(url=web_app_url))

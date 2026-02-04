@@ -3,7 +3,8 @@
  */
 const API = {
     // Base URL - change to your server
-    baseUrl: 'https://kurortnik24-production-7a2c.up.railway.app/api',
+    // Base URL - relative path allows it to work on any domain
+    baseUrl: '/api',
 
     /**
      * Make API request
