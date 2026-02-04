@@ -145,8 +145,8 @@ async def serve_admin():
     return FileResponse(static_dir / "admin.html")
 
 # Keep this as fallback for assets, but remove html=True to avoid conflicts
-# REMOVED conflicting mount
-# app.mount("/", StaticFiles(directory=str(static_dir), html=False), name="static")
+# Re-enabled to serve CSS/JS from root
+app.mount("/", StaticFiles(directory=str(static_dir), html=False), name="static")
 
 
 
