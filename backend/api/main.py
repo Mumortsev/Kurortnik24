@@ -131,7 +131,8 @@ async def serve_admin():
     return FileResponse(static_dir / "admin.html")
 
 # Keep this as fallback for assets, but remove html=True to avoid conflicts
-app.mount("/", StaticFiles(directory=str(static_dir), html=False), name="static")
+# REMOVED conflicting mount
+# app.mount("/", StaticFiles(directory=str(static_dir), html=False), name="static")
 
 
 
