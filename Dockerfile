@@ -17,8 +17,7 @@ RUN apt-get update && apt-get install -y \
 COPY backend/requirements.txt /app/
 
 # Install dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --default-timeout=1000 --retries 10 -r requirements.txt
+RUN pip install --no-cache-dir --prefer-binary --default-timeout=1000 --retries 10 -r requirements.txt
 
 # Copy backend code
 COPY backend/ /app/
