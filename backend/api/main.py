@@ -117,7 +117,21 @@ os.makedirs(uploads_dir, exist_ok=True)
 print(f"Verified static directories: {static_dir}, {uploads_dir}")
 
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static_assets") 
-app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
+
+@app.get("/")
+async def serve_index():
+    return FileResponse(static_dir / "index.html")
+
+@app.get("/index.html")
+async def serve_index_explicit():
+    return FileResponse(static_dir / "index.html")
+
+@app.get("/admin.html")
+async def serve_admin():
+    return FileResponse(static_dir / "admin.html")
+
+# Keep this as fallback for assets, but remove html=True to avoid conflicts
+app.mount("/", StaticFiles(directory=str(static_dir), html=False), name="static")
 
 
 
