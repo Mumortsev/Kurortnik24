@@ -97,11 +97,17 @@ async def debug_info():
 
 # Serve Static Files (Frontend)
 # Use absolute path to ensure consistency
-from pathlib import Path
-current_file = Path(__file__).resolve()
-backend_root = current_file.parent.parent
-static_dir = backend_root / "static"
-uploads_dir = static_dir / "uploads"
+# Determine if running in Docker
+is_docker = os.path.exists("/app/static")
+
+if is_docker:
+    static_dir = Path("/app/static")
+    uploads_dir = Path("/app/static/uploads")
+else:
+    current_file = Path(__file__).resolve()
+    backend_root = current_file.parent.parent
+    static_dir = backend_root / "static"
+    uploads_dir = static_dir / "uploads"
 
 # Ensure both directories exist on startup
 os.makedirs(static_dir, exist_ok=True)
