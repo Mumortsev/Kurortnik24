@@ -165,6 +165,9 @@ const Catalog = {
                 <div style="font-size: 10px; color: #f00; margin-top: 10px; white-space: pre-wrap; word-break: break-all;">
                     DEBUG: ${JSON.stringify(this.lastApiResponse || 'No data captured')}
                 </div>
+                <button onclick="Catalog.loadCategories()" class="btn btn-primary" style="margin-top: 15px; width: 100%;">
+                    Загрузить снова
+                </button>
             </div>`;
         } else {
             this.categories.forEach(cat => {
@@ -244,6 +247,7 @@ const Catalog = {
      * Load categories
      */
     async loadCategories() {
+        this.lastApiResponse = 'Started loading...';
         try {
             console.log('Loading categories...');
             const data = await API.getCategories();
