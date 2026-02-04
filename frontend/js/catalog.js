@@ -160,7 +160,12 @@ const Catalog = {
         `;
 
         if (!this.categories || this.categories.length === 0) {
-            html += `<div style="padding: 20px; text-align: center; color: #999;">Нет категорий</div>`;
+            html += `<div style="padding: 20px; text-align: center; color: #999;">
+                Нет категорий<br>
+                <div style="font-size: 10px; color: #f00; margin-top: 10px; white-space: pre-wrap; word-break: break-all;">
+                    DEBUG: ${JSON.stringify(this.lastApiResponse || 'No data captured')}
+                </div>
+            </div>`;
         } else {
             this.categories.forEach(cat => {
                 const hasSub = cat.subcategories && cat.subcategories.length > 0;
@@ -244,6 +249,8 @@ const Catalog = {
             const data = await API.getCategories();
             console.log('Categories API response:', data);
 
+            this.lastApiResponse = data; // Store for debug
+
             this.categories = data.categories || data || [];
             console.log('Parsed categories:', this.categories);
 
@@ -256,6 +263,8 @@ const Catalog = {
             this.renderCategories();
         } catch (error) {
             console.error('Failed to load categories:', error);
+            this.lastApiResponse = { error: error.message }; // Store error
+
             const debugEl = document.getElementById('debug-console');
             if (debugEl) {
                 debugEl.innerHTML += `Err loading cats: ${error.message}<br>`;

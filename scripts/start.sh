@@ -34,6 +34,7 @@ python -m bot.main &
 # Start FastAPI server in foreground
 echo "Starting FastAPI server..."
 echo "--- DEBUG INFO ---"
+ls -la /data || echo "/data not reachable"
 ls -la /app/api/main.py
 echo "Checking for debug-files endpoint code:"
 grep "debug-files" /app/api/main.py || echo "NOT FOUND!"
