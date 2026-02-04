@@ -152,6 +152,17 @@ app.mount("/", StaticFiles(directory=str(static_dir), html=False), name="static"
 
 
 
+@app.get("/debug/force-seed")
+async def force_seed_db():
+    """Forces the database seeding process."""
+    try:
+        from .seeder import seed_categories
+        await seed_categories()
+        return {"status": "ok", "message": "Seeding initiated. Check logs."}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
