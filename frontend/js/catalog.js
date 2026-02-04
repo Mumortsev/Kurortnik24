@@ -248,6 +248,12 @@ const Catalog = {
      */
     async loadCategories() {
         this.lastApiResponse = 'Started loading...';
+
+        // REFRESH MENU UI: Show loading state
+        if (document.getElementById('catalogMenuModal') && document.getElementById('catalogMenuModal').classList.contains('active')) {
+            this.showMenuCategories();
+        }
+
         try {
             console.log('Loading categories...');
             const data = await API.getCategories();
@@ -274,6 +280,11 @@ const Catalog = {
                 debugEl.innerHTML += `Err loading cats: ${error.message}<br>`;
             }
             this.categories = [];
+        }
+
+        // REFRESH MENU UI: Show result
+        if (document.getElementById('catalogMenuModal') && document.getElementById('catalogMenuModal').classList.contains('active')) {
+            this.showMenuCategories();
         }
     },
 
