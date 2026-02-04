@@ -24,4 +24,11 @@ python -m bot.main &
 
 # Start FastAPI server in foreground
 echo "Starting FastAPI server..."
+echo "--- DEBUG INFO ---"
+ls -la /app/api/main.py
+echo "Checking for debug-files endpoint code:"
+grep "debug-files" /app/api/main.py || echo "NOT FOUND!"
+echo "Listing static files:"
+ls -R /app/static || echo "Static dir error"
+echo "--- END DEBUG ---"
 exec uvicorn api.main:app --host 0.0.0.0 --port $PORT
