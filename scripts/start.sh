@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# Use 8000 as default port for Amvera
-PORT=${PORT:-8000}
+# Use 80 as default port for Amvera
+PORT=${PORT:-80}
 echo "Running on port: $PORT"
 
 # Ensure database is initialized in the persistent volume
