@@ -50,8 +50,8 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
 
-    /* Header height - Logo + Search + Categories */
-    --header-height: 190px;
+    /* Header height - Compact */
+    --header-height: 66px;
 
     /* Bottom nav height */
     --bottom-nav-height: 70px;
@@ -101,8 +101,7 @@ body {
    ===================================================== */
 .header {
     position: fixed;
-    /* Header height - Compact */
-    --header-height: 66px;
+    /* Header height defined in :root */
     top: 0;
     left: 0;
     right: 0;
@@ -110,7 +109,7 @@ body {
     background: var(--bg-secondary);
     padding: 0 var(--spacing-md);
     padding-top: calc(8px + env(safe-area-inset-top, 0px));
-    padding-bottom: 8px;
+    /* padding-bottom removed for flush layout */
 }
 
 .main-content {
@@ -248,8 +247,11 @@ body {
 .search-clear {
     position: absolute;
     right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
+    /* Fixed positioning to FORCE movement */
+    top: 14px !important;
+    transform: none !important;
+    margin-top: 0 !important;
+    /* Align with text */
     width: 28px;
     height: 28px;
     border: none;

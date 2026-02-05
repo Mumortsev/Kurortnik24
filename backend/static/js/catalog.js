@@ -12,6 +12,7 @@ const Catalog = {
     searchQuery: '',
     sortBy: 'name_asc',
     products: [],
+    localQuantities: {}, // Track local selection for cards
 
     // Config
     itemsPerPage: 12,
@@ -22,6 +23,7 @@ const Catalog = {
     async init() {
         await this.loadCategories();
         this.setupEventListeners();
+        this.setupMenu();
         await this.loadProducts(true);
     },
 
@@ -33,127 +35,281 @@ const Catalog = {
         const searchInput = document.getElementById('searchInput');
         const searchClear = document.getElementById('searchClear');
 
-        let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
-            searchClear.style.display = query ? 'flex' : 'none';
+        // Debounce utility
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
 
-            searchTimeout = setTimeout(() => {
-                this.searchQuery = query;
-                this.loadProducts(true);
-            }, 300);
-        });
-
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            searchClear.style.display = 'none';
-            this.searchQuery = '';
+        // Search execution function
+        const performSearch = () => {
+            if (!searchInput) return;
+            const query = searchInput.value.trim();
+            this.searchQuery = query;
             this.loadProducts(true);
-        });
+        };
+
+        // Debounced search
+        const debouncedSearch = debounce(() => performSearch(), 400);
+
+        // Input handler - Real-time search
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value;
+                if (searchClear) searchClear.style.display = query ? 'flex' : 'none';
+                debouncedSearch();
+            });
+        }
+
+        if (searchClear && searchInput) {
+            searchClear.addEventListener('click', () => {
+                searchInput.value = '';
+                searchClear.style.display = 'none';
+                this.searchQuery = '';
+                this.loadProducts(true);
+                searchInput.focus();
+            });
+        }
 
         // Sort
         const sortSelect = document.getElementById('sortSelect');
-        sortSelect.addEventListener('change', (e) => {
-            this.sortBy = e.target.value;
-            this.loadProducts(true);
-        });
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.sortBy = e.target.value;
+                this.loadProducts(true);
+            });
+        }
 
         // Infinite scroll
-        const mainContent = document.getElementById('mainContent');
-        mainContent.addEventListener('scroll', () => {
+        window.addEventListener('scroll', () => {
             if (this.isLoading || !this.hasMore) return;
 
-            const scrollTop = mainContent.scrollTop;
-            const scrollHeight = mainContent.scrollHeight;
-            const clientHeight = mainContent.clientHeight;
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = window.innerHeight;
 
-            if (scrollTop + clientHeight >= scrollHeight - 200) {
+            // Load more when user is near bottom (300px buffer)
+            if (scrollTop + clientHeight >= scrollHeight - 300) {
                 this.loadMoreProducts();
             }
+        }, { passive: true });
 
-            // Scroll to top button
-            const scrollTopBtn = document.getElementById('scrollTop');
-            scrollTopBtn.style.display = scrollTop > 300 ? 'block' : 'none';
+        // Load More Button (Manual Fallback)
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                this.loadMoreProducts();
+            });
+        }
+    },
+
+    /**
+     * Setup menu event listeners
+     */
+    setupMenu() {
+        const closeBtn = document.getElementById('menuCloseBtn');
+        const backBtn = document.getElementById('menuBackBtn');
+
+        if (closeBtn) closeBtn.addEventListener('click', () => this.closeMenu());
+        if (backBtn) backBtn.addEventListener('click', () => this.showMenuCategories());
+    },
+
+    /**
+     * Open Catalog Menu
+     */
+    openMenu() {
+        const menu = document.getElementById('catalogMenuModal');
+        menu.classList.add('active');
+
+        // Ensure categories are loaded
+        if (!this.categories || this.categories.length === 0) {
+            this.loadCategories();
+        } else {
+            this.showMenuCategories();
+        }
+
+        document.body.style.overflow = 'hidden';
+    },
+
+    /**
+     * Close Catalog Menu
+     */
+    closeMenu() {
+        const menu = document.getElementById('catalogMenuModal');
+        menu.classList.remove('active');
+        document.body.style.overflow = '';
+    },
+
+    /**
+     * Show main categories in menu
+     */
+    showMenuCategories() {
+        console.log('Rendering menu categories. Count:', this.categories.length);
+        const title = document.getElementById('menuTitle');
+        const backBtn = document.getElementById('menuBackBtn');
+        const container = document.getElementById('catalogMenuContent');
+
+        title.textContent = 'Каталог';
+        backBtn.style.display = 'none';
+
+        let html = `
+            <div class="catalog-menu-item" onclick="Catalog.handleMenuSelection(null, null)">
+                <span class="catalog-menu-item-text">Все товары</span>
+                <span class="catalog-menu-item-icon">→</span>
+            </div>
+        `;
+
+        if (!this.categories || this.categories.length === 0) {
+            if (this.lastApiResponse === 'Started loading...') {
+                html += `<div style="padding: 40px; text-align: center; color: #999;">
+                    <div class="spinner" style="margin: 0 auto 15px auto;"></div>
+                    Загрузка категорий...
+                </div>`;
+            } else {
+                html += `<div style="padding: 20px; text-align: center; color: #999;">
+                    Нет категорий<br>
+                    <div style="font-size: 10px; color: #f00; margin-top: 10px; white-space: pre-wrap; word-break: break-all;">
+                        DEBUG: ${JSON.stringify(this.lastApiResponse || 'No data captured')}
+                    </div>
+                    <button onclick="Catalog.loadCategories()" class="btn btn-primary" style="margin-top: 15px; width: 100%;">
+                        Загрузить снова
+                    </button>
+                </div>`;
+            }
+        } else {
+            this.categories.forEach(cat => {
+                const hasSub = cat.subcategories && cat.subcategories.length > 0;
+                const clickAction = hasSub ?
+                    `Catalog.showMenuSubcategories(${cat.id})` :
+                    `Catalog.handleMenuSelection(${cat.id}, null)`;
+
+                html += `
+                    <div class="catalog-menu-item" onclick="${clickAction}">
+                        <span class="catalog-menu-item-text">${cat.name}</span>
+                        <span class="catalog-menu-item-icon">${hasSub ? '→' : ''}</span>
+                    </div>
+                `;
+            });
+        }
+
+        container.innerHTML = html;
+    },
+
+    /**
+     * Show subcategories for a category
+     */
+    showMenuSubcategories(categoryId) {
+        const category = this.categories.find(c => c.id === categoryId);
+        if (!category) return;
+
+        const title = document.getElementById('menuTitle');
+        const backBtn = document.getElementById('menuBackBtn');
+        const container = document.getElementById('catalogMenuContent');
+
+        title.textContent = category.name;
+        backBtn.style.display = 'flex';
+
+        let html = `
+            <div class="catalog-menu-item" onclick="Catalog.handleMenuSelection(${category.id}, null)">
+                <span class="catalog-menu-item-text">Все в категории "${category.name}"</span>
+                <span class="catalog-menu-item-icon">→</span>
+            </div>
+        `;
+
+        category.subcategories.forEach(sub => {
+            if (sub.name === 'Все') return;
+            html += `
+                <div class="catalog-menu-item" onclick="Catalog.handleMenuSelection(${category.id}, ${sub.id})">
+                    <span class="catalog-menu-item-text">${sub.name}</span>
+                </div>
+            `;
         });
 
-        // Scroll to top
-        document.getElementById('scrollTop').addEventListener('click', () => {
-            mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        container.innerHTML = html;
+    },
+
+    /**
+     * Handle selection from menu
+     */
+    handleMenuSelection(categoryId, subcategoryId) {
+        this.closeMenu();
+        App.showCatalog(); // Ensure we are on listing page
+
+        if (categoryId === null) {
+            // "All Products"
+            this.selectCategory(null);
+        } else if (subcategoryId === null) {
+            // "All in Category"
+            this.selectCategory(categoryId);
+        } else {
+            // Specific subcategory
+            this.selectCategory(categoryId); // This renders subcat chips
+            setTimeout(() => {
+                this.selectSubcategory(subcategoryId); // This selects specific chip and reloads
+            }, 50);
+        }
     },
 
     /**
      * Load categories
      */
     async loadCategories() {
+        this.lastApiResponse = 'Started loading...';
+
+        // REFRESH MENU UI: Show loading state
+        if (document.getElementById('catalogMenuModal') && document.getElementById('catalogMenuModal').classList.contains('active')) {
+            this.showMenuCategories();
+        }
+
         try {
+            console.log('Loading categories...');
             const data = await API.getCategories();
+            console.log('Categories API response:', data);
+
+            this.lastApiResponse = data; // Store for debug
+
             this.categories = data.categories || data || [];
+            console.log('Parsed categories:', this.categories);
+
+            // Debug output to screen if debug console exists
+            const debugEl = document.getElementById('debug-console');
+            if (debugEl) {
+                debugEl.innerHTML += `Cats loaded: ${this.categories.length}<br>`;
+            }
+
             this.renderCategories();
         } catch (error) {
             console.error('Failed to load categories:', error);
+            this.lastApiResponse = { error: error.message }; // Store error
+
+            const debugEl = document.getElementById('debug-console');
+            if (debugEl) {
+                debugEl.innerHTML += `Err loading cats: ${error.message}<br>`;
+            }
             this.categories = [];
+        }
+
+        // REFRESH MENU UI: Show result
+        if (document.getElementById('catalogMenuModal') && document.getElementById('catalogMenuModal').classList.contains('active')) {
+            this.showMenuCategories();
         }
     },
 
     /**
      * Render categories
      */
-    renderCategories() {
-        const container = document.getElementById('categoriesSwipe');
-
-        // "All" chip first
-        let html = `<button class="category-chip all ${!this.currentCategory ? 'active' : ''}" data-id="">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="5" cy="5" r="3"/>
-                <circle cx="12" cy="5" r="3"/>
-                <circle cx="19" cy="5" r="3"/>
-                <circle cx="5" cy="12" r="3"/>
-                <circle cx="12" cy="12" r="3"/>
-                <circle cx="19" cy="12" r="3"/>
-            </svg>
-            All
-        </button>`;
-
-        // Category chips
-        this.categories.forEach(cat => {
-            const isActive = this.currentCategory === cat.id;
-            const icon = this.getCategoryIcon(cat.name);
-            html += `<button class="category-chip ${isActive ? 'active' : ''}" data-id="${cat.id}">
-                ${icon}
-                ${cat.name}
-            </button>`;
-        });
-
-        container.innerHTML = html;
-
-        // Click handlers
-        container.querySelectorAll('.category-chip').forEach(chip => {
-            chip.addEventListener('click', () => this.selectCategory(chip.dataset.id));
-        });
-    },
-
     /**
-     * Get icon for category
+     * Render categories - Only for internal state, logic moved to Menu
      */
-    getCategoryIcon(categoryName) {
-        const icons = {
-            'Зонты': '🏖️',
-            'Маски': '🤿',
-            'Ласты': '🦈',
-            'Обувь': '👟',
-            'Палатки': '⛺',
-            'Катаны': '⚔️',
-            'Сачки': '🎣'
-        };
-
-        for (const [key, icon] of Object.entries(icons)) {
-            if (categoryName.toLowerCase().includes(key.toLowerCase())) {
-                return icon;
-            }
-        }
-        return '';
+    renderCategories() {
+        // Legacy chip rendering removed
     },
 
     /**
@@ -163,49 +319,15 @@ const Catalog = {
         const id = categoryId ? parseInt(categoryId) : null;
         this.currentCategory = id;
         this.currentSubcategory = null;
-
-        // Update active state
-        document.querySelectorAll('.category-chip').forEach(chip => {
-            const chipId = chip.dataset.id ? parseInt(chip.dataset.id) : null;
-            chip.classList.toggle('active', chipId === id);
-        });
-
-        // Render subcategories
-        if (id) {
-            const category = this.categories.find(c => c.id === id);
-            if (category && category.subcategories && category.subcategories.length > 0) {
-                this.renderSubcategories(category.subcategories);
-            } else {
-                document.getElementById('subcategoriesSwipe').style.display = 'none';
-            }
-        } else {
-            document.getElementById('subcategoriesSwipe').style.display = 'none';
-        }
-
-        this.updateHeaderHeight();
         this.loadProducts(true);
     },
 
     /**
-     * Render subcategories
+     * Format price
      */
-    renderSubcategories(subcategories) {
-        const container = document.getElementById('subcategoriesSwipe');
-
-        let html = `<button class="subcategory-chip ${!this.currentSubcategory ? 'active' : ''}" data-id="">Все</button>`;
-
-        subcategories.forEach(sub => {
-            if (sub.name === 'Все') return;
-            const isActive = this.currentSubcategory === sub.id;
-            html += `<button class="subcategory-chip ${isActive ? 'active' : ''}" data-id="${sub.id}">${sub.name}</button>`;
-        });
-
-        container.innerHTML = html;
-        container.style.display = 'flex';
-
-        container.querySelectorAll('.subcategory-chip').forEach(chip => {
-            chip.addEventListener('click', () => this.selectSubcategory(chip.dataset.id));
-        });
+    formatPrice(price) {
+        if (!price) return '0';
+        return Math.round(price * 100) / 100;
     },
 
     /**
@@ -214,22 +336,14 @@ const Catalog = {
     selectSubcategory(subcategoryId) {
         const id = subcategoryId ? parseInt(subcategoryId) : null;
         this.currentSubcategory = id;
-
-        document.querySelectorAll('.subcategory-chip').forEach(chip => {
-            const chipId = chip.dataset.id ? parseInt(chip.dataset.id) : null;
-            chip.classList.toggle('active', chipId === id);
-        });
-
         this.loadProducts(true);
     },
 
     /**
-     * Update header height
+     * Update header height - No longer needed
      */
     updateHeaderHeight() {
-        const subcats = document.getElementById('subcategoriesSwipe');
-        const hasSubcats = subcats.style.display !== 'none';
-        document.documentElement.style.setProperty('--header-height', hasSubcats ? '240px' : '200px');
+        // No-op
     },
 
     /**
@@ -270,10 +384,6 @@ const Catalog = {
 
             if (this.products.length === 0) {
                 document.getElementById('noProducts').style.display = 'block';
-                document.getElementById('loadMoreBtn').style.display = 'none';
-            } else {
-                // Show load more if has more
-                document.getElementById('loadMoreBtn').style.display = this.hasMore ? 'block' : 'none';
             }
 
         } catch (error) {
@@ -285,6 +395,12 @@ const Catalog = {
         } finally {
             this.isLoading = false;
             document.getElementById('productsLoading').style.display = 'none';
+
+            // Update Load More Button visibility
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) {
+                loadMoreBtn.style.display = this.hasMore ? 'block' : 'none';
+            }
         }
     },
 
@@ -292,7 +408,10 @@ const Catalog = {
      * Load more products
      */
     loadMoreProducts() {
-        if (this.isLoading || !this.hasMore) return;
+        if (!this.hasMore) return;
+        if (this.isLoading) return;
+
+        console.log('Loading more products page:', this.currentPage + 1);
         this.currentPage++;
         this.loadProducts(false);
     },
@@ -311,35 +430,37 @@ const Catalog = {
             return `
             <div class="product-card" data-id="${product.id}">
                 ${badgeHtml}
-                <img 
-                    class="product-image skeleton" 
-                    src="${API.getImageUrl(product.image, 'small')}"
-                    alt="${product.name}"
-                    onload="this.classList.remove('skeleton'); this.classList.add('loaded');"
-                    onerror="this.onerror=null; this.classList.remove('skeleton'); this.classList.add('loaded'); this.src='assets/placeholder.svg'"
-                >
+                <div class="product-image-wrapper">
+                    <img 
+                        class="product-image skeleton" 
+                        src="${API.getImageUrl(product.images?.[0]?.file_id || product.images?.[0]?.image_url || product.image_file_id || product.image_url, 'small')}"
+                        alt="${product.name}"
+                        onload="this.classList.remove('skeleton'); this.classList.add('loaded');"
+                        onerror="this.onerror=null; this.classList.remove('skeleton'); this.classList.add('loaded'); this.src='assets/placeholder.svg'"
+                    >
+                    <!-- Cart Button on Image (Bottom Right) -->
+                    <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${product.id}); event.stopPropagation();">
+                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" />
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" />
+                            <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6" />
+                        </svg>
+                    </button>
+                </div>
+                
                 <div class="product-info">
                     <div class="product-name">${product.name}</div>
-                    <div class="product-price-row">
-                        <div class="product-price">${this.formatPrice(product.price_per_unit)}<span class="currency">₽</span></div>
-                    </div>
                     <div class="product-pack">${product.pieces_per_pack} шт/пач</div>
-                    <div class="card-controls" onclick="event.stopPropagation();">
-                        ${qtyInCart > 0 ? `
-                            <div class="card-qty-controls">
-                                <button class="card-qty-btn" onclick="Catalog.updateCardQty(${product.id}, -1)">−</button>
-                                <span class="card-qty" id="grid-qty-${product.id}">${qtyInCart}</span>
-                                <button class="card-qty-btn" onclick="Catalog.updateCardQty(${product.id}, 1)">+</button>
-                            </div>
-                        ` : `
-                            <button class="card-add-btn" type="button" onclick="event.stopPropagation(); Catalog.addToCartFromCard(${product.id})">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
-                                    <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
-                                    <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6"/>
-                                </svg>
-                            </button>
-                        `}
+                    
+                    <div class="product-footer">
+                        <div class="product-price">${this.formatPrice(product.price_per_unit)}<span class="currency">₽</span></div>
+                        
+                        <!-- Quantity Controls (Right) -->
+                        <div class="card-qty-controls" onclick="event.stopPropagation();">
+                            <button class="card-qty-btn" onclick="Catalog.adjustLocalQty(${product.id}, -1)">−</button>
+                            <span class="card-qty" id="grid-qty-${product.id}">${this.localQuantities[product.id] || 1}</span>
+                            <button class="card-qty-btn" onclick="Catalog.adjustLocalQty(${product.id}, 1)">+</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -351,6 +472,14 @@ const Catalog = {
             grid.innerHTML = html;
         }
 
+        // Check if we need to load more to fill the screen
+        if (this.hasMore && !this.isLoading) {
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = window.innerHeight;
+            if (scrollHeight <= clientHeight + 100) {
+                setTimeout(() => this.loadMoreProducts(), 100);
+            }
+        }
         // Click handlers for card (open modal)
         grid.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', (e) => {
@@ -364,75 +493,48 @@ const Catalog = {
     },
 
     /**
-     * Add to cart from card
+     * Add to cart from card (using local selection)
      */
     addToCartFromCard(productId) {
-        // event is not passed here directly in previous inline call, but we prevented propagation in HTML
         const product = this.products.find(p => p.id === productId);
         if (!product) return;
 
-        Cart.addProduct(product, 1);
+        const qtyToAdd = this.localQuantities[productId] || 1;
+
+        Cart.addProduct(product, qtyToAdd);
         App.updateCartBadge();
 
-        // Re-render the card to show qty controls
+        // Optional: Reset local counter to 1 for visual feedback? 
+        this.localQuantities[productId] = 1;
         this.refreshCardControls(productId);
     },
 
     /**
-     * Update card quantity
+     * Adjust local quantity on card
      */
-    updateCardQty(productId, delta) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-
-        const currentPacks = this.getProductQtyInCart(productId);
-        const newPacks = currentPacks + delta;
-
-        if (newPacks <= 0) {
-            Cart.removeItem(productId);
-        } else {
-            if (currentPacks === 0) {
-                Cart.addProduct(product, newPacks);
-            } else {
-                Cart.updateQuantity(productId, newPacks);
-            }
+    adjustLocalQty(productId, delta) {
+        if (!this.localQuantities[productId]) {
+            this.localQuantities[productId] = 1;
         }
 
-        App.updateCartBadge();
+        const current = this.localQuantities[productId];
+        const product = this.products.find(p => p.id === productId);
+        const min = product?.min_order_packs || 1;
+
+        let newQty = current + delta;
+        if (newQty < min) newQty = min;
+
+        this.localQuantities[productId] = newQty;
         this.refreshCardControls(productId);
     },
 
     /**
-     * Refresh card controls after qty change
+     * Refresh card controls
      */
     refreshCardControls(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-
-        const card = document.querySelector(`.product-card[data-id="${productId}"]`);
-        if (!card) return;
-
-        const controlsContainer = card.querySelector('.card-controls');
-        const qtyInCart = this.getProductQtyInCart(productId);
-
-        if (qtyInCart > 0) {
-            controlsContainer.innerHTML = `
-                <div class="card-qty-controls">
-                    <button class="card-qty-btn" onclick="Catalog.updateCardQty(${productId}, -1)">−</button>
-                    <span class="card-qty" id="grid-qty-${productId}">${qtyInCart}</span>
-                    <button class="card-qty-btn" onclick="Catalog.updateCardQty(${productId}, 1)">+</button>
-                </div>
-            `;
-        } else {
-            controlsContainer.innerHTML = `
-                <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${productId})">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
-                        <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
-                        <path d="M1 1H5L7.68 14.39C7.77 14.83 8.02 15.22 8.38 15.5C8.74 15.78 9.19 15.92 9.64 15.9H19.36C19.81 15.92 20.26 15.78 20.62 15.5C20.98 15.22 21.23 14.83 21.32 14.39L23 6H6"/>
-                    </svg>
-                </button>
-            `;
+        const qtyDisplay = document.getElementById(`grid-qty-${productId}`);
+        if (qtyDisplay) {
+            qtyDisplay.textContent = this.localQuantities[productId] || 1;
         }
     },
 

@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель</title>
-    <link rel="stylesheet" href="css/styles.css?v=2.1">
-    <link rel="stylesheet" href="css/admin.css?v=2.1">
+    <link rel="stylesheet" href="css/styles.css?v=2.3">
+    <link rel="stylesheet" href="css/admin.css?v=2.3">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -36,9 +36,14 @@
 
             <!-- Categories Tab -->
             <div id="categoriesTab" class="tab-content active">
-                <div class="section-header">
+                <div class="section-header"
+                    style="justify-content: space-between; align-items: flex-start; padding-right: 10px;">
                     <h3>Структура каталога</h3>
-                    <button class="btn btn-primary" onclick="Admin.openCategoryModal()">+ Категория</button>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 10px;">
+                        <button class="btn btn-primary btn-green"
+                            style="padding: 8px 20px; font-size: 14px; border-radius: 30px; box-shadow: 0 4px 12px rgba(33, 115, 70, 0.3);"
+                            onclick="Admin.openCategoryModal()">+ Категория</button>
+                    </div>
                 </div>
                 <!-- Breadcrumbs -->
                 <div id="breadcrumbs" class="breadcrumbs" style="display:none;">
@@ -54,7 +59,8 @@
                 <div id="categoryProductsSection" style="display:none; margin-top: 30px;">
                     <div class="section-header">
                         <h3>Товары в этой категории</h3>
-                        <button class="btn btn-sm btn-primary"
+                        <button class="btn btn-primary btn-green"
+                            style="padding: 8px 20px; font-size: 14px; border-radius: 30px; box-shadow: 0 4px 12px rgba(33, 115, 70, 0.3);"
                             onclick="Admin.openProductModal(null, Admin.currentCategoryId)">+ Товар</button>
                     </div>
                     <div class="table-container">
@@ -75,9 +81,15 @@
 
             <!-- Products Tab (All) -->
             <div id="productsTab" class="tab-content">
-                <div class="section-header">
+                <div class="section-header"
+                    style="justify-content: space-between; align-items: flex-start; padding-right: 10px;">
                     <h3>Все товары</h3>
-                    <button class="btn btn-primary" onclick="Admin.openProductModal()">+ Товар</button>
+                    <!-- Aligned to be roughly under the 'Import' tab which is the 3rd tab -->
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 10px;">
+                        <button class="btn btn-primary btn-green"
+                            style="padding: 8px 20px; font-size: 14px; border-radius: 30px; box-shadow: 0 4px 12px rgba(33, 115, 70, 0.3);"
+                            onclick="Admin.openProductModal()">+ Товар</button>
+                    </div>
                 </div>
                 <div class="search-bar">
                     <input type="text" id="productSearch" placeholder="Поиск по названию..."
@@ -102,24 +114,29 @@
 
             <!-- Upload Tab -->
             <div id="uploadTab" class="tab-content">
-                <div class="instruction-step">
-                    <span class="step-number">1</span>
-                    <p>Подготовьте файл Excel (таблицу) с товарами.</p>
+                <div class="instruction-step" style="margin-bottom: 40px; text-align: center;">
+                    <p style="font-size: 16px; color: var(--text-secondary);">Подготовьте файл Excel (таблицу) с
+                        товарами.</p>
                 </div>
-                <div class="upload-zone" id="dropZone">
-                    <div class="upload-icon">📥</div>
-                    <h3>Загрузить файл Excel</h3>
+
+                <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-btn-excel">
+                        <div class="upload-icon-large">📥</div>
+                        <div class="upload-text-main">Загрузить файл Excel</div>
+                        <div class="upload-text-sub">Нажмите для выбора файла</div>
+                    </div>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
                 </div>
-                <div class="upload-status" id="uploadStatus"></div>
 
-                <div class="danger-zone" style="margin-top: 50px; border-top: 2px solid #ffcccc; padding-top: 20px;">
-                    <h4 style="color: #dc3545;">Опасная зона</h4>
-                    <p>Если товары или категории отображаются неправильно, нажмите кнопку ниже, чтобы полностью очистить
-                        базу и перезаписать её стандартными данными.</p>
-                    <button class="btn" style="background-color: #dc3545; color: white;"
-                        onclick="Admin.resetDatabase()">⚠️ Полный Сброс Базы Данных</button>
+                <!-- Download Template Link -->
+                <div style="margin-top: 15px; text-align: center;">
+                    <a href="#" onclick="event.preventDefault(); Admin.downloadTemplate();"
+                        style="color: var(--primary-color); text-decoration: underline; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+                        <span>📥</span> Скачать образец таблицы
+                    </a>
                 </div>
+
+                <div class="upload-status" id="uploadStatus" style="margin-top: 20px;"></div>
             </div>
         </main>
     </div>
@@ -127,8 +144,10 @@
     <!-- Modals -->
     <div id="categoryModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="Admin.closeModal('categoryModal')">&times;</span>
-            <h3 id="catModalTitle">Создать категорию</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="catModalTitle" style="margin:0;">Создать категорию</h3>
+                <button class="close-modal" onclick="Admin.closeModal('categoryModal')">✕</button>
+            </div>
             <div class="form-group">
                 <label>Название</label>
                 <input type="text" id="catNameInput" class="form-control">
@@ -142,8 +161,10 @@
 
     <div id="productModal" class="modal">
         <div class="modal-content modal-lg">
-            <span class="close-modal" onclick="Admin.closeModal('productModal')">&times;</span>
-            <h3 id="prodModalTitle">Товар</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 id="prodModalTitle" style="margin:0;">Товар</h3>
+                <button class="close-modal" onclick="Admin.closeModal('productModal')">✕</button>
+            </div>
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label>Название *</label>
@@ -178,6 +199,17 @@
                     <input type="text" id="prodCountry" class="form-control">
                 </div>
                 <div class="form-group full-width">
+                    <label>Фотографии</label>
+                    <div id="prodImagesList" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                        <!-- Images rendered here -->
+                    </div>
+                    <label for="prodImageUpload" class="upload-btn-interactive">
+                        + Добавить фото
+                    </label>
+                    <input type="file" id="prodImageUpload" accept="image/*" hidden multiple
+                        onchange="Admin.handleImageUpload(this.files)">
+                </div>
+                <div class="form-group full-width">
                     <label>Описание</label>
                     <textarea id="prodDesc" class="form-control" rows="3"></textarea>
                 </div>
@@ -189,8 +221,8 @@
         </div>
     </div>
 
-    <script src="js/api.js?v=2.1"></script>
-    <script src="js/admin.js?v=2.1"></script>
+    <script src="js/api.js?v=2.3"></script>
+    <script src="js/admin.js?v=2.3"></script>
 </body>
 
 </html>
