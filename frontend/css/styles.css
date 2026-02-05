@@ -101,20 +101,22 @@ body {
    ===================================================== */
 .header {
     position: fixed;
-    /* Header height - Reduced further to tighten gap */
-    --header-height: 60px;
+    /* Header height - Compact */
+    --header-height: 66px;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
     background: var(--bg-secondary);
-    padding: var(--spacing-md);
-    padding-top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px));
+    padding: 0 var(--spacing-md);
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+    padding-bottom: 8px;
 }
 
 .main-content {
     /* Add header height + minimal spacing */
-    padding-top: calc(var(--header-height) + 10px);
+    /* Add header height + ZERO extra spacing */
+    padding-top: var(--header-height);
     padding-bottom: 100px;
     /* Fix bottom overlap */
     padding-left: var(--spacing-md);
