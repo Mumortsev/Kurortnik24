@@ -41,13 +41,13 @@ const Admin = {
         }
         const url = `${API.baseUrl}/admin/template`;
 
-        // Try Telegram WebApp method first (best for mobile)
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
-            window.Telegram.WebApp.openLink(url, { try_instant_view: false });
-        } else {
-            // Fallback for desktop/browser
-            window.open(url, '_blank');
-        }
+        // Force download via anchor tag to avoid "black screen"
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'import_template.xlsx'; // Hint to browser
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     },
 
     async checkAuth() {
