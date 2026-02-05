@@ -112,6 +112,14 @@
                     <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
                 </div>
                 <div class="upload-status" id="uploadStatus"></div>
+
+                <div class="danger-zone" style="margin-top: 50px; border-top: 2px solid #ffcccc; padding-top: 20px;">
+                    <h4 style="color: #dc3545;">Опасная зона</h4>
+                    <p>Если товары или категории отображаются неправильно, нажмите кнопку ниже, чтобы полностью очистить
+                        базу и перезаписать её стандартными данными.</p>
+                    <button class="btn" style="background-color: #dc3545; color: white;"
+                        onclick="Admin.resetDatabase()">⚠️ Полный Сброс Базы Данных</button>
+                </div>
             </div>
         </main>
     </div>

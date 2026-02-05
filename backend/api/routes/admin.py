@@ -55,3 +55,25 @@ async def get_excel_template():
         'Content-Disposition': 'attachment; filename="import_template.xlsx"'
     }
     return Response(content=output.getvalue(), media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers=headers)
+
+@router.post("/reset-db")
+async def reset_database(data: AdminCheckRequest):
+    """
+    NUCLEAR OPTION: Drops all tables and reseeds the database.
+    Use with caution!
+    """
+    if data.user_id not in ADMIN_IDS:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    from ..database import engine, Base
+    from ..seeder import seed_categories
+    
+    # Drop all tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+        
+    # Re-seed
+    await seed_categories()
+    
+    return {"status": "ok", "message": "Database has been reset completely."}

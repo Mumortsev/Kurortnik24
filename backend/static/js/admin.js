@@ -467,6 +467,28 @@ const Admin = {
         } catch (e) {
             status.textContent = 'Ошибка: ' + e;
         }
+    },
+
+    async resetDatabase() {
+        if (!confirm('ВНИМАНИЕ! Это действие удалит ВСЕ категории и товары из базы данных и восстановит стандартные. Вы уверены?')) return;
+        if (!confirm('Вы точно уверены? Это действие необратимо!')) return;
+
+        try {
+            const response = await fetch(`${API.baseUrl}/admin/reset-db`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: this.userId })
+            });
+
+            if (response.ok) {
+                alert('База данных успешно сброшена! Страница будет перезагружена.');
+                location.reload();
+            } else {
+                alert('Ошибка сброса базы.');
+            }
+        } catch (e) {
+            alert('Ошибка сервера: ' + e);
+        }
     }
 };
 
