@@ -106,6 +106,20 @@ async def seed_categories():
     logger.info("Checking/Seeding categories and products...")
     
     async with AsyncSessionLocal() as session:
+        # Check for Forced Reset
+        import os
+        if os.getenv("RESET_DB", "false").lower() == "true":
+            logger.warning("RESET_DB is set to true! Wiping all categories and products...")
+            from sqlalchemy import text
+            # Disable constraints for SQLite to allow deletion
+            await session.execute(text("PRAGMA foreign_keys = OFF"))
+            await session.execute(text("DELETE FROM products"))
+            await session.execute(text("DELETE FROM subcategories"))
+            await session.execute(text("DELETE FROM categories"))
+            await session.execute(text("PRAGMA foreign_keys = ON"))
+            await session.commit()
+            logger.warning("Database wiped.")
+
         # 1. Add Simple Categories and Products
         for cat_name in SIMPLE_CATEGORIES:
             # Check/Add Category
