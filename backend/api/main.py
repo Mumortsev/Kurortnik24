@@ -122,22 +122,35 @@ if is_docker:
 else:
     current_file = Path(__file__).resolve()
     backend_root = current_file.parent.parent
+    # Try multiple ways to find project root
     project_root = backend_root.parent
-    frontend_dir = project_root / "frontend"
     
-    if frontend_dir.exists():
+    # Check common relative locations
+    possible_frontends = [
+        project_root / "frontend",
+        backend_root / "../frontend",
+        Path("C:/Antigravity/Project/frontend"), # Hardcoded fallback for this user's env
+    ]
+    
+    frontend_dir = None
+    for path in possible_frontends:
+        if path.resolve().exists():
+            frontend_dir = path.resolve()
+            break
+            
+    if frontend_dir:
         static_dir = frontend_dir
-        print(f"Using frontend directory for static files: {static_dir}")
+        print(f"✅ SUCCESS: Serving Frontend from: {static_dir}")
     else:
         static_dir = backend_root / "static"
-        print(f"Using backend/static for static files: {static_dir}")
+        print(f"⚠️ WARNING: Frontend not found, serving backend/static: {static_dir}")
         
     uploads_dir = static_dir / "uploads"
 
 # Ensure both directories exist on startup
 os.makedirs(static_dir, exist_ok=True)
 os.makedirs(uploads_dir, exist_ok=True)
-print(f"Verified static directories: {static_dir}, {uploads_dir}")
+print(f"Active Static Directory: {static_dir}")
 
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static_assets") 
 
