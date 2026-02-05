@@ -74,9 +74,15 @@ async def upload_image(file: UploadFile = File(...)):
         import shutil
         import uuid
         
-        current_file = Path(__file__).resolve()
-        backend_root = current_file.parent.parent.parent
-        upload_dir = backend_root / "static" / "uploads"
+        # Check if running in Docker (Amvera)
+        is_docker = os.path.exists("/data")
+        
+        if is_docker:
+            upload_dir = Path("/data/uploads")
+        else:
+            current_file = Path(__file__).resolve()
+            backend_root = current_file.parent.parent.parent
+            upload_dir = backend_root / "static" / "uploads"
         
         os.makedirs(upload_dir, exist_ok=True)
         
@@ -89,7 +95,12 @@ async def upload_image(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
             
         # Return path relative to root (for static serving)
-        return {"url": f"/static/uploads/{filename}", "file_id": f"/static/uploads/{filename}"}
+        # In Docker, files are served from /uploads, locally from /static/uploads
+        if is_docker:
+            url_path = f"/uploads/{filename}"
+        else:
+            url_path = f"/static/uploads/{filename}"
+        return {"url": url_path, "file_id": url_path}
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")

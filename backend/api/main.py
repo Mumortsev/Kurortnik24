@@ -163,6 +163,13 @@ print(f"Active Static Directory: {static_dir}")
 
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static_assets") 
 
+# In Docker, mount persistent uploads from /data/uploads
+if os.path.exists("/data"):
+    persistent_uploads = Path("/data/uploads")
+    os.makedirs(persistent_uploads, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=str(persistent_uploads)), name="persistent_uploads")
+    print(f"✅ Persistent Uploads mounted from: {persistent_uploads}") 
+
 @app.get("/")
 async def serve_index():
     return FileResponse(static_dir / "index.html")
