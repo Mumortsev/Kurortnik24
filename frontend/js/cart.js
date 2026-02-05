@@ -111,6 +111,7 @@ const Cart = {
      */
     updateBadge() {
         const badge = document.getElementById('cartBadge');
+        if (!badge) return;
         const count = this.getItemsCount();
 
         if (count > 0) {
@@ -147,7 +148,7 @@ const Cart = {
             return `
                 <div class="cart-item" data-product-id="${item.product.id}">
                     <img class="cart-item-image" 
-                         src="${API.getImageUrl(item.product.images?.[0]?.file_id || item.product.images?.[0]?.image_url || item.product.image_file_id || item.product.image_url, 'small')}" 
+                         src="${API.getImageUrl(item.product)}" 
                          alt="${item.product.name}"
                          loading="lazy">
                     <div class="cart-item-info">

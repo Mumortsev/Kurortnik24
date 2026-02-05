@@ -3,7 +3,8 @@
  */
 const API = {
     // Base URL - change to your server
-    baseUrl: window.location.origin + '/api',
+    // Base URL - relative path allows it to work on any domain
+    baseUrl: '/api',
 
     /**
      * Make API request
@@ -91,8 +92,8 @@ const API = {
      * Get user orders
      */
     async getOrders(telegramId = null) {
-        const params = telegramId ? `?telegram_user_id=${telegramId}` : '';
-        return this.request(`/orders/me${params}`);
+        const params = telegramId ? `?telegram_id=${telegramId}` : '';
+        return this.request(`/orders${params}`);
     },
 
     /**
@@ -107,19 +108,7 @@ const API = {
         }
 
         // If it's a file path
-        if (fileIdOrUrl.startsWith('assets/')) {
-            return fileIdOrUrl;
-        }
-
-        // If it's a static backend file (uploaded)
-        if (fileIdOrUrl.startsWith('/static/')) {
-            const origin = new URL(this.baseUrl).origin;
-            const fullUrl = `${origin}${fileIdOrUrl}`;
-            console.log('[API] Resolved static URL:', fullUrl);
-            return fullUrl;
-        }
-
-        if (fileIdOrUrl.startsWith('/')) {
+        if (fileIdOrUrl.startsWith('/') || fileIdOrUrl.startsWith('assets/')) {
             return fileIdOrUrl;
         }
 

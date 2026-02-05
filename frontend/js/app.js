@@ -11,32 +11,26 @@ const App = {
      * Initialize app
      */
     async init() {
-        try {
-            // Setup event listeners immediately
-            this.setupEventListeners();
+        // Initialize cart first
+        Cart.init();
 
-            // Initialize cart
-            Cart.init();
+        // Telegram WebApp
+        this.initTelegramWebApp();
 
-            // Telegram WebApp
-            this.initTelegramWebApp();
+        // Initialize modules
+        await Catalog.init();
 
-            // Initialize modules with error handling
-            try {
-                await Catalog.init();
-            } catch (err) {
-                console.error('Catalog init failed:', err);
-                App.showToast('Ошибка загрузки каталога');
-            }
+        // Setup event listeners
+        this.setupEventListeners();
 
-            // Update cart badges
-            this.updateCartBadge();
+        // Update cart badges
+        this.updateCartBadge();
 
-            // Check for existing session
-            this.checkAuth();
-        } catch (error) {
-            console.error('App init failed:', error);
-        }
+        // Check for existing session
+        this.checkAuth();
+
+        // Update welcome message
+        this.updateWelcomeMessage();
     },
 
     /**
@@ -73,8 +67,6 @@ const App = {
      */
     updateWelcomeMessage() {
         const welcomeEl = document.getElementById('welcomeMessage');
-        if (!welcomeEl) return;
-
         if (this.user && this.user.first_name) {
             welcomeEl.textContent = `Добро пожаловать, ${this.user.first_name}!`;
         } else {
@@ -86,17 +78,16 @@ const App = {
      * Setup event listeners
      */
     setupEventListeners() {
+        // Header cart button
+        document.getElementById('cartBtnHeader').addEventListener('click', () => {
+            this.showCart();
+        });
+
         // Back buttons
         document.getElementById('productBackBtn').addEventListener('click', () => this.showCatalog());
         document.getElementById('cartBackBtn').addEventListener('click', () => this.showCatalog());
         document.getElementById('checkoutBackBtn').addEventListener('click', () => this.showCart());
         document.getElementById('profileBackBtn').addEventListener('click', () => this.showCatalog());
-
-        // Header Catalog Button
-        const headerCatalogBtn = document.getElementById('headerCatalogBtn');
-        if (headerCatalogBtn) {
-            headerCatalogBtn.addEventListener('click', () => Catalog.openMenu());
-        }
 
         // Checkout button
         document.getElementById('checkoutBtn').addEventListener('click', () => {
@@ -140,107 +131,36 @@ const App = {
 
         // Product modal
         this.setupModal();
-
-        // Phone mask
-        this.setupPhoneMask();
-    },
-
-    /**
-     * Setup phone mask
-     */
-    setupPhoneMask() {
-        const input = document.getElementById('customerPhone');
-
-        const formatPhone = (value) => {
-            if (!value) return '';
-
-            // Strip non-digits
-            let digits = value.replace(/\D/g, '');
-
-            // Handle starting with 8 or other digit by forcing 7
-            if (digits.length > 0) {
-                if (digits[0] === '8') {
-                    digits = '7' + digits.substring(1);
-                } else if (digits[0] !== '7') {
-                    digits = '7' + digits;
-                }
-            }
-
-            // Limit to 11 digits (7 + 10 digits)
-            digits = digits.substring(0, 11);
-
-            let formatted = '';
-            if (digits.length > 0) formatted += '+7';
-            if (digits.length > 1) formatted += ' (' + digits.substring(1, 4);
-            if (digits.length > 4) formatted += ') ' + digits.substring(4, 7);
-            if (digits.length > 7) formatted += '-' + digits.substring(7, 9);
-            if (digits.length > 9) formatted += '-' + digits.substring(9, 11);
-
-            return formatted;
-        };
-
-        input.addEventListener('input', (e) => {
-            const oldValue = e.target.value;
-            const newValue = formatPhone(oldValue);
-
-            if (oldValue !== newValue) {
-                e.target.value = newValue;
-            }
-        });
-
-        // Prevent deleting prefix easily
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && input.value.length <= 4) {
-                e.preventDefault();
-                input.value = '';
-            }
-        });
-
-        // Focus handler
-        input.addEventListener('focus', () => {
-            if (!input.value) {
-                input.value = '+7 (';
-            }
-        });
-
-        // Blur handler
-        input.addEventListener('blur', () => {
-            if (input.value === '+7' || input.value === '+7 (') {
-                input.value = '';
-            }
-        });
     },
 
     /**
      * Setup bottom navigation
      */
     setupBottomNav() {
-        // Use event delegation on the container
-        const navContainer = document.querySelector('.nav-pill');
+        const navItems = document.querySelectorAll('.nav-item[data-view]');
 
-        if (!navContainer) return;
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const viewId = item.dataset.view;
 
-        navContainer.addEventListener('click', (e) => {
-            // Find the closest nav-item ancestor (or the element itself)
-            const item = e.target.closest('.nav-item');
+                // Update active state
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
 
-            // If no nav-item was clicked, or it doesn't have a view (e.g. just a container), ignore
-            if (!item || !item.dataset.view) return;
+                // Show view
+                if (viewId === 'cartView') {
+                    this.showCart();
+                } else if (viewId === 'profileView') {
+                    this.showView('profileView');
+                } else {
+                    this.showCatalog();
+                }
+            });
+        });
 
-            const viewId = item.dataset.view;
-
-            // Update active state
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            item.classList.add('active');
-
-            // Show view
-            if (viewId === 'cartView') {
-                this.showCart();
-            } else if (viewId === 'profileView') {
-                this.showView('profileView');
-            } else {
-                this.showCatalog();
-            }
+        // Favorites button (placeholder - just show toast)
+        document.getElementById('navFavorites').addEventListener('click', () => {
+            this.showToast('Избранное скоро будет доступно');
         });
     },
 
@@ -416,10 +336,7 @@ const App = {
         try {
             const orders = await API.getOrders(this.user.id);
 
-            // Handle wrapped response {orders: []} or array []
-            const ordersList = orders.orders ? orders.orders : orders;
-
-            if (!ordersList || !Array.isArray(ordersList) || ordersList.length === 0) {
+            if (!orders || orders.length === 0) {
                 document.getElementById('ordersEmpty').style.display = 'block';
                 document.getElementById('ordersList').innerHTML = '';
                 return;
@@ -427,32 +344,19 @@ const App = {
 
             document.getElementById('ordersEmpty').style.display = 'none';
 
-            const html = ordersList.map(order => {
-                const itemsHtml = order.items.map(item => `
-                    <div class="order-item-row">
-                        <span>${item.product_name} x ${item.quantity_packs}</span>
-                        <span>${item.subtotal}₽</span>
-                    </div>
-                `).join('');
-
-                return `
+            const html = orders.map(order => `
                 <div class="order-card">
                     <div class="order-header">
                         <span class="order-id">Заказ #${order.id}</span>
                         <span class="order-status ${order.status}">${this.getStatusLabel(order.status)}</span>
                     </div>
-                    <div class="order-items-list">
-                        ${itemsHtml}
-                    </div>
+                    <div class="order-items">${order.items?.length || 0} товар(ов)</div>
                     <div class="order-footer">
-                        <span class="order-total-label">Итого:</span>
-                        <span class="order-total">${order.total_amount || order.total}₽</span>
-                    </div>
-                     <div class="order-date-row">
+                        <span class="order-total">${order.total}₽</span>
                         <span class="order-date">${this.formatDate(order.created_at)}</span>
                     </div>
                 </div>
-            `}).join('');
+            `).join('');
 
             document.getElementById('ordersList').innerHTML = html;
         } catch (error) {
@@ -497,19 +401,6 @@ const App = {
             this.currentView = viewId;
         }
 
-        // Toggle header visibility
-        const header = document.querySelector('.header');
-        const mainContent = document.getElementById('mainContent');
-        const hideHeaderViews = ['checkoutView', 'cartView', 'profileView'];
-
-        if (hideHeaderViews.includes(viewId)) {
-            header.style.display = 'none';
-            mainContent.classList.add('no-header');
-        } else {
-            header.style.display = 'block';
-            mainContent.classList.remove('no-header');
-        }
-
         // Update back button
         this.updateBackButton();
 
@@ -524,8 +415,7 @@ const App = {
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
         if (viewId === 'productsView') {
-            const navHome = document.getElementById('navHome');
-            if (navHome) navHome.classList.add('active');
+            document.getElementById('navHome').classList.add('active');
         } else if (viewId === 'cartView') {
             document.getElementById('navCart').classList.add('active');
         } else if (viewId === 'profileView') {
@@ -727,10 +617,12 @@ const App = {
         }
 
         const orderData = {
-            telegram_user_id: this.user?.id || 0,
+            telegram_id: this.user?.id || null,
             customer_name: name,
             customer_phone: phone,
-            customer_organization: orgName || null,
+            customer_type: customerType,
+            customer_org: orgName || null,
+            comment: comment || null,
             items: items.map(item => ({
                 product_id: item.product.id,
                 quantity_packs: item.packs
