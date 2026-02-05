@@ -111,6 +111,7 @@ const Cart = {
      */
     updateBadge() {
         const badge = document.getElementById('cartBadge');
+        if (!badge) return;
         const count = this.getItemsCount();
 
         if (count > 0) {

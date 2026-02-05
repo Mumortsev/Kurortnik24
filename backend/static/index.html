@@ -71,18 +71,23 @@
                 <!-- Sort -->
                 <div class="sort-container">
                     <select class="sort-select" id="sortSelect">
+                        <option value="name_asc" selected>По названию (А-Я)</option>
                         <option value="newest">Сначала новые</option>
                         <option value="oldest">Сначала старые</option>
                         <option value="price_asc">Цена ↑</option>
                         <option value="price_desc">Цена ↓</option>
-                        <option value="name_asc">А-Я</option>
-                        <option value="name_desc">Я-А</option>
+                        <option value="name_desc">По названию (Я-А)</option>
                     </select>
                 </div>
 
                 <!-- Products Grid -->
                 <div class="products-grid" id="productsGrid">
                     <!-- Products loaded here -->
+                </div>
+
+                <div class="load-more-container" style="padding: 10px 0;">
+                    <button id="loadMoreBtn" class="btn btn-secondary btn-block" style="display: none;"
+                        onclick="Catalog.loadMoreProducts()">Показать еще</button>
                 </div>
 
                 <!-- Loading -->
@@ -228,8 +233,8 @@
             <div class="product-modal-backdrop" id="modalBackdrop"></div>
             <div class="product-modal-content">
                 <button class="modal-close-btn" id="modalCloseBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
                 <button class="modal-cart-btn" id="modalCartBtn">

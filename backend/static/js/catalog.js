@@ -10,7 +10,7 @@ const Catalog = {
     hasMore: true,
     isLoading: false,
     searchQuery: '',
-    sortBy: 'newest',
+    sortBy: 'name_asc',
     products: [],
 
     // Config
@@ -270,6 +270,10 @@ const Catalog = {
 
             if (this.products.length === 0) {
                 document.getElementById('noProducts').style.display = 'block';
+                document.getElementById('loadMoreBtn').style.display = 'none';
+            } else {
+                // Show load more if has more
+                document.getElementById('loadMoreBtn').style.display = this.hasMore ? 'block' : 'none';
             }
 
         } catch (error) {
@@ -328,7 +332,7 @@ const Catalog = {
                                 <button class="card-qty-btn" onclick="Catalog.updateCardQty(${product.id}, 1)">+</button>
                             </div>
                         ` : `
-                            <button class="card-add-btn" onclick="Catalog.addToCartFromCard(${product.id})">
+                            <button class="card-add-btn" type="button" onclick="event.stopPropagation(); Catalog.addToCartFromCard(${product.id})">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
                                     <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
@@ -363,6 +367,7 @@ const Catalog = {
      * Add to cart from card
      */
     addToCartFromCard(productId) {
+        // event is not passed here directly in previous inline call, but we prevented propagation in HTML
         const product = this.products.find(p => p.id === productId);
         if (!product) return;
 

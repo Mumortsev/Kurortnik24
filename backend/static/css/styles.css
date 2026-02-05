@@ -354,7 +354,7 @@ body {
     flex: 1;
     margin-top: var(--header-height);
     padding: var(--spacing-md);
-    padding-bottom: calc(var(--spacing-xl) + var(--bottom-nav-height));
+    padding-bottom: calc(var(--spacing-xl) + var(--bottom-nav-height) + 30px);
     overflow-y: auto;
 }
 
