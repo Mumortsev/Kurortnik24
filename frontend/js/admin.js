@@ -23,11 +23,30 @@ const Admin = {
         }
 
         this.setupTabs();
+        this.switchTab('categories'); // Ensure we start clean
         this.setupUpload();
 
         if (this.isAdmin || !window.Telegram.WebApp.initData) {
             this.loadCategories();
-            this.loadProducts(); // Preload for search
+
+            // Don't load products immediately to speed up init and avoid clutter
+            // this.loadProducts();
+        }
+    },
+
+    downloadTemplate() {
+        if (!API || !API.baseUrl) {
+            alert('Ошибка: API не иницилизировано');
+            return;
+        }
+        const url = `${API.baseUrl}/admin/template`;
+
+        // Try Telegram WebApp method first (best for mobile)
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
+            window.Telegram.WebApp.openLink(url, { try_instant_view: false });
+        } else {
+            // Fallback for desktop/browser
+            window.open(url, '_blank');
         }
     },
 
@@ -70,10 +89,14 @@ const Admin = {
 
                 btn.classList.add('active');
                 const tabId = btn.dataset.tab + 'Tab';
+                // Show target
                 document.getElementById(tabId).style.display = 'block';
 
-                if (btn.dataset.tab === 'categories') this.loadCategories();
-                if (btn.dataset.tab === 'products') this.loadProducts();
+                if (btn.dataset.tab === 'categories') {
+                    this.loadCategories();
+                } else if (btn.dataset.tab === 'products') {
+                    this.loadProducts();
+                }
             });
         });
     },
@@ -102,9 +125,9 @@ const Admin = {
                 <div class="category-info" style="font-size:12px; color:#888;">
                     ${c.subcategories ? c.subcategories.length : 0} подкат.
                 </div>
-                <div class="category-actions" onclick="event.stopPropagation()">
-                    <button class="btn-icon" onclick="Admin.openCategoryModal(${c.id})">✏️</button>
-                    <button class="btn-icon" style="color:red;" onclick="Admin.deleteCategory(${c.id})">🗑</button>
+                <div class="category-actions" onclick="event.stopPropagation()" style="display: flex; gap: 8px;">
+                    <button class="btn-icon-styled primary" onclick="Admin.openCategoryModal(${c.id})">✏️</button>
+                    <button class="btn-icon-styled danger" onclick="Admin.deleteCategory(${c.id})">🗑</button>
                 </div>
             </div>
         `).join('');
@@ -130,18 +153,18 @@ const Admin = {
                     <div class="category-info" style="font-size:12px; color:#888;">
                        Нажмите, чтобы открыть
                     </div>
-                    <div class="category-actions" onclick="event.stopPropagation()">
-                        <button class="btn-icon">✏️</button>
-                        <button class="btn-icon" style="color:red;" onclick="Admin.deleteSubcategory(${s.id})">🗑</button>
+                    <div class="category-actions" onclick="event.stopPropagation()" style="display: flex; gap: 8px;">
+                        <button class="btn-icon-styled primary" onclick="event.stopPropagation(); Admin.openSubcategoryModal(${category.id}, ${s.id})">✏️</button>
+                        <button class="btn-icon-styled danger" onclick="event.stopPropagation(); Admin.deleteSubcategory(${s.id})">🗑</button>
                     </div>
                 </div>
             `).join('') + `
-            <div class="category-card" style="border-style:dashed; opacity:0.7;" onclick="Admin.openSubcategoryModal(${catId})">
+            <div class="category-card" style="border-style:dashed; border-color: #217346; color: #217346; opacity:0.9;" onclick="Admin.openSubcategoryModal(${catId})">
                 <div class="category-name" style="margin:auto;">+ Подкатегория</div>
             </div>`;
         } else {
             document.getElementById('categoriesList').innerHTML = `
-             <div class="category-card" style="border-style:dashed; opacity:0.75; min-height:80px;" onclick="Admin.openSubcategoryModal(${catId})">
+             <div class="category-card" style="border-style:dashed; border-color: #217346; color: #217346; opacity:0.9; min-height:80px;" onclick="Admin.openSubcategoryModal(${catId})">
                 <div class="category-name" style="margin:auto;">+ Добавить подкатегорию</div>
             </div>`;
         }
@@ -261,15 +284,17 @@ const Admin = {
     renderProductRow(p) {
         return `
             <tr>
-                <td><img src="${API.getImageUrl(p.image, 'small')}" onerror="this.src='assets/placeholder.svg'"></td>
+                <td><img src="${API.getImageUrl(p.images?.[0]?.file_id || p.images?.[0]?.image_url || p.image_file_id || p.image_url, 'small')}" onerror="this.src='assets/placeholder.svg'"></td>
                 <td>
                     <div style="font-weight:600;">${p.name}</div>
                     <div style="font-size:12px; color:#888;">Цена: ${p.price_per_unit}₽</div>
                 </td>
                 <td>${p.sku || '-'}</td>
                 <td>
-                    <button class="btn-icon" onclick="Admin.openProductModal(${p.id})">✏️</button>
-                    <button class="btn-icon" style="color:red;" onclick="Admin.deleteProduct(${p.id})">🗑</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-icon-styled primary" onclick="Admin.openProductModal(${p.id})">✏️</button>
+                        <button class="btn-icon-styled danger" onclick="Admin.deleteProduct(${p.id})">🗑</button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -327,6 +352,8 @@ const Admin = {
         }
     },
 
+    currentProductImages: [], // Store file_ids
+
     async openProductModal(prodId = null, preselectCatId = null) {
         this.editingProductId = prodId;
         document.getElementById('prodModalTitle').textContent = prodId ? 'Редактировать товар' : 'Новый товар';
@@ -339,6 +366,9 @@ const Admin = {
         document.getElementById('prodSku').value = '';
         document.getElementById('prodCountry').value = '';
         document.getElementById('prodDesc').value = '';
+
+        this.currentProductImages = [];
+        this.renderProductImages();
 
         // Load categories into select
         const catSelect = document.getElementById('prodCategory');
@@ -368,9 +398,62 @@ const Admin = {
             if (p.subcategory_id) {
                 document.getElementById('prodSubcategory').value = p.subcategory_id;
             }
+
+            // Load images
+            if (p.images && p.images.length > 0) {
+                this.currentProductImages = p.images.map(img => img.file_id || img.image_url).filter(Boolean);
+            } else if (p.image_file_id) {
+                this.currentProductImages = [p.image_file_id];
+            } else if (p.image_url) {
+                this.currentProductImages = [p.image_url];
+            } else {
+                this.currentProductImages = [];
+            }
+            this.renderProductImages();
         }
 
         document.getElementById('productModal').classList.add('active');
+    },
+
+    renderProductImages() {
+        const container = document.getElementById('prodImagesList');
+        container.innerHTML = this.currentProductImages.map((img, index) => `
+            <div style="position: relative; width: 60px; height: 60px;">
+                <img src="${API.getImageUrl(img, 'small')}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                <button onclick="Admin.removeImage(${index})" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; line-height: 18px; cursor: pointer; font-size: 12px;">×</button>
+            </div>
+        `).join('');
+    },
+
+    removeImage(index) {
+        this.currentProductImages.splice(index, 1);
+        this.renderProductImages();
+    },
+
+    async handleImageUpload(files) {
+        if (!files || files.length === 0) return;
+
+        for (let i = 0; i < files.length; i++) {
+            const formData = new FormData();
+            formData.append('file', files[i]);
+
+            try {
+                const response = await fetch(`${API.baseUrl}/images/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.file_id) {
+                    this.currentProductImages.push(data.file_id);
+                }
+            } catch (e) {
+                console.error("Upload failed", e);
+                alert("Ошибка загрузки фото");
+            }
+        }
+        this.renderProductImages();
+        // Clear input so same file can be selected again
+        document.getElementById('prodImageUpload').value = '';
     },
 
     onCategoryChange() {
@@ -396,7 +479,8 @@ const Admin = {
             in_stock: document.getElementById('prodStock').value ? parseInt(document.getElementById('prodStock').value) : null,
             sku: document.getElementById('prodSku').value,
             country: document.getElementById('prodCountry').value,
-            description: document.getElementById('prodDesc').value
+            description: document.getElementById('prodDesc').value,
+            images: this.currentProductImages
         };
 
         if (!data.name || !data.category_id || isNaN(data.price_per_unit)) {
@@ -466,28 +550,6 @@ const Admin = {
             status.textContent = res.message || 'Готово';
         } catch (e) {
             status.textContent = 'Ошибка: ' + e;
-        }
-    },
-
-    async resetDatabase() {
-        if (!confirm('ВНИМАНИЕ! Это действие удалит ВСЕ категории и товары из базы данных и восстановит стандартные. Вы уверены?')) return;
-        if (!confirm('Вы точно уверены? Это действие необратимо!')) return;
-
-        try {
-            const response = await fetch(`${API.baseUrl}/admin/reset-db`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: this.userId })
-            });
-
-            if (response.ok) {
-                alert('База данных успешно сброшена! Страница будет перезагружена.');
-                location.reload();
-            } else {
-                alert('Ошибка сброса базы.');
-            }
-        } catch (e) {
-            alert('Ошибка сервера: ' + e);
         }
     }
 };

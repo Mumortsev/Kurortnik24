@@ -122,7 +122,16 @@ if is_docker:
 else:
     current_file = Path(__file__).resolve()
     backend_root = current_file.parent.parent
-    static_dir = backend_root / "static"
+    project_root = backend_root.parent
+    frontend_dir = project_root / "frontend"
+    
+    if frontend_dir.exists():
+        static_dir = frontend_dir
+        print(f"Using frontend directory for static files: {static_dir}")
+    else:
+        static_dir = backend_root / "static"
+        print(f"Using backend/static for static files: {static_dir}")
+        
     uploads_dir = static_dir / "uploads"
 
 # Ensure both directories exist on startup
