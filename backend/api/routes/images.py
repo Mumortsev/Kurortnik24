@@ -65,16 +65,17 @@ async def get_image(file_id: str):
 
 @router.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
-    """Upload an image locally."""
+    """
+    Загрузка изображения с автоматическим сжатием и конвертацией в WebP.
+    Создаёт основное фото (макс. 1200px) и превью (300px).
+    """
     try:
-        # Create uploads dir (Absolute path relative to backend root)
-        # __file__ = backend/api/routes/images.py
-        # parent.parent.parent = backend/
         from pathlib import Path
-        import shutil
+        from PIL import Image
+        import io
         import uuid
         
-        # Check if running in Docker (Amvera)
+        # Определяем директорию для сохранения
         is_docker = os.path.exists("/data")
         
         if is_docker:
@@ -86,21 +87,62 @@ async def upload_image(file: UploadFile = File(...)):
         
         os.makedirs(upload_dir, exist_ok=True)
         
-        # Generate unique filename
-        ext = os.path.splitext(file.filename)[1]
-        filename = f"{uuid.uuid4()}{ext}"
-        file_path = upload_dir / filename
+        # Читаем файл в память
+        contents = await file.read()
         
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-            
-        # Return path relative to root (for static serving)
-        # In Docker, files are served from /uploads, locally from /static/uploads
+        # Открываем через Pillow
+        try:
+            img = Image.open(io.BytesIO(contents))
+        except Exception:
+            raise HTTPException(status_code=400, detail="Невозможно открыть файл как изображение")
+        
+        # Конвертируем RGBA в RGB (WebP не всегда хорошо работает с прозрачностью)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = background
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+        
+        # Генерируем уникальное имя
+        unique_id = str(uuid.uuid4())
+        
+        # === Основное фото (максимум 1200px по широкой стороне) ===
+        main_img = img.copy()
+        max_size = 1200
+        if main_img.width > max_size or main_img.height > max_size:
+            main_img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+        
+        main_filename = f"{unique_id}.webp"
+        main_path = upload_dir / main_filename
+        main_img.save(main_path, "WEBP", quality=85, optimize=True)
+        
+        # === Превью (300px для каталога) ===
+        thumb_img = img.copy()
+        thumb_size = 300
+        thumb_img.thumbnail((thumb_size, thumb_size), Image.Resampling.LANCZOS)
+        
+        thumb_filename = f"{unique_id}_thumb.webp"
+        thumb_path = upload_dir / thumb_filename
+        thumb_img.save(thumb_path, "WEBP", quality=80, optimize=True)
+        
+        # Формируем URL для ответа
         if is_docker:
-            url_path = f"/uploads/{filename}"
+            url_path = f"/uploads/{main_filename}"
+            thumb_url = f"/uploads/{thumb_filename}"
         else:
-            url_path = f"/static/uploads/{filename}"
-        return {"url": url_path, "file_id": url_path}
+            url_path = f"/static/uploads/{main_filename}"
+            thumb_url = f"/static/uploads/{thumb_filename}"
         
+        return {
+            "url": url_path,
+            "file_id": url_path,
+            "thumbnail": thumb_url
+        }
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки: {str(e)}")
